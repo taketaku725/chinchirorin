@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>酒粕チンチロ</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div id="app">
+
+    <!-- セットアップ -->
+    <section id="setup">
+      <h1 class="title">酒粕チンチロ</h1>
+
+      <!-- ★ バージョン選択をタイトル直下へ -->
+      <div class="version-select">
+        <select id="version">
+          <option value="1">バージョン1</option>
+          <option value="2">バージョン2</option>
+        </select>
+      </div>
+
+      <div class="setup-panel">
+        <div class="input-row">
+          <input id="newPlayerName" placeholder="プレイヤー名">
+          <button id="addPlayerBtn">追加</button>
+        </div>
+
+        <div id="playerList" class="player-list"></div>
+
+        <button id="startBtn" class="full-btn">開始</button>
+      </div>
+    </section>
+
+    <!-- ゲーム画面 -->
+    <section id="game" class="hidden">
+
+      <div id="gameHeader">
+        <span id="versionLabel"></span>
+      </div>
+
+      <div id="turnInfo"></div>
+
+      <div id="diceArea">
+        <div class="dice-scene">
+          <div class="dice-cube" id="dice1">
+            <div class="face front"></div>
+            <div class="face back"></div>
+            <div class="face right"></div>
+            <div class="face left"></div>
+            <div class="face top"></div>
+            <div class="face bottom"></div>
+          </div>
+        </div>
+
+        <div class="dice-scene">
+          <div class="dice-cube" id="dice2">
+            <div class="face front"></div>
+            <div class="face back"></div>
+            <div class="face right"></div>
+            <div class="face left"></div>
+            <div class="face top"></div>
+            <div class="face bottom"></div>
+          </div>
+        </div>
+
+        <div class="dice-scene">
+          <div class="dice-cube" id="dice3">
+            <div class="face front"></div>
+            <div class="face back"></div>
+            <div class="face right"></div>
+            <div class="face left"></div>
+            <div class="face top"></div>
+            <div class="face bottom"></div>
+          </div>
+        </div>
+      </div>
+
+      <button id="rollBtn" class="full-btn">振る</button>
+
+      <div id="result"></div>
+      <div id="effectResult"></div>
+      <div id="log"></div>
+
+      <button id="nextTurnBtn" class="hidden">次のターンへ</button>
+
+      <button id="backToSetupBtn" class="hidden">最初の画面に戻る</button>
+
+    </section>
+
+  </div>
+
+  <script src="js/state.js"></script>
+  <script src="js/players.js"></script>
+  <script src="js/dice.js"></script>
+  <script src="js/yaku.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
