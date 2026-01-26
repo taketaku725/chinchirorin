@@ -89,23 +89,38 @@ function judgeYaku(dice) {
   return { name: "目なし", rank: 10 };
 }
 
-
 function weakestPlayers(players) {
-  // 1. 役ランクで最弱抽出
-  const maxRank = Math.max(...players.map(p => p.yakuRank));
-  let weakest = players.filter(p => p.yakuRank === maxRank);
 
-  // 2. 目あり同士ならサブ値で比較
-  const meariOnly = weakest.every(p => p.yaku === "目あり");
-  if (meariOnly) {
-    const minSub = Math.min(...weakest.map(p => p.sub));
-    weakest = weakest.filter(p => p.sub === minSub);
+  // --- 革命なし：通常処理 ---
+  if (!GameState.revolution) {
+    const maxRank = Math.max(...players.map(p => p.yakuRank));
+    let weakest = players.filter(p => p.yakuRank === maxRank);
+
+    // 目あり同士なら sub が小さい方が弱い
+    const meariOnly = weakest.every(p => p.yaku === "目あり");
+    if (meariOnly) {
+      const minSub = Math.min(...weakest.map(p => p.sub));
+      weakest = weakest.filter(p => p.sub === minSub);
+    }
+
+    return weakest;
   }
 
-  if (GameState.turnEffect === "REVOLUTION") {
-    // 最弱 ⇄ 最強 を反転
-    const minRank = Math.min(...players.map(p => p.yakuRank));
-    weakest = players.filter(p => p.yakuRank === minRank);
+  // --- 革命あり：最強が負け ---
+  // ゴゾロ（革命耐性）を除外
+  const affected = players.filter(p => !p.noRevolution);
+
+  // 念のため：全員ゴゾロだった場合
+  if (affected.length === 0) return [];
+
+  const minRank = Math.min(...affected.map(p => p.yakuRank));
+  let weakest = affected.filter(p => p.yakuRank === minRank);
+
+  // 目あり同士なら sub が大きい方が負け（逆転）
+  const meariOnly = weakest.every(p => p.yaku === "目あり");
+  if (meariOnly) {
+    const maxSub = Math.max(...weakest.map(p => p.sub));
+    weakest = weakest.filter(p => p.sub === maxSub);
   }
 
   return weakest;
