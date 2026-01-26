@@ -1,0 +1,260 @@
+:root {
+  --green-main: #2fdc8c;
+  --green-dark: #1aa36b;
+}
+
+body {
+  background: #081a14;
+  color: #eafff6;
+}
+
+.title {
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+
+#app {
+  padding: 16px;
+}
+
+.hidden {
+  display: none;
+}
+
+h1 {
+  text-align: center;
+}
+
+textarea {
+  width: 100%;
+  height: 120px;
+}
+
+button {
+  background: var(--green-dark);
+  color: #081a14;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  min-height: 48px;
+  font-size:16px;
+  border-radius: 12px;
+}
+
+button:disabled {
+  opacity: 0.4;
+}
+
+.full-btn {
+  width: 100%;
+  min-height: 60px;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 16px 0;
+
+  background: var(--green-main);
+  color: #062015;
+
+  box-shadow:
+    0 4px 0 #138a5a,
+    0 8px 20px rgba(0,0,0,0.4);
+}
+
+.setup-panel {
+  background: #0f3327;
+  border-radius: 12px;
+  padding: 16px;
+  max-width: 420px;
+  margin: 0 auto;
+  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+}
+
+.input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.input-row input {
+  flex: 1;
+  padding: 8px;
+  background: #0b1f17;
+  border: 1px solid #1f8f5f;
+  color: #e6f2ec;
+  border-radius: 6px;
+}
+
+.player-list {
+  margin-top: 12px;
+}
+
+.player-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #143b2d;
+  padding: 8px 10px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  cursor: grab;
+}
+
+.player-row.dragging {
+  opacity: 0.5;
+}
+
+
+.player-row.rest {
+  opacity: 0.35;
+  filter: grayscale(60%);
+}
+
+.player-row .name {
+  font-weight: 600;
+}
+
+.player-row .actions button {
+  margin-left: 6px;
+  background: none;
+  border: 1px solid #1f8f5f;
+  color: #e6f2ec;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12px;
+}
+
+.setup-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.version-select {
+  display: flex;
+  justify-content: center;
+  margin: 12px 0 8px;
+}
+
+.version-select select {
+  background: #0f3327;
+  color: #eafff6;
+  border: 1px solid var(--green-dark);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 14px;
+}
+
+.start-btn {
+  background: #2ecc71;
+  color: #0b1f17;
+  font-weight: bold;
+}
+
+
+#diceArea {
+  background: #0f3327;
+  padding: 16px 8px;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px #1aa36b;
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+  perspective: 600px; /* ★ 3D感の要 */
+}
+
+.dice-scene {
+  width: 72px;
+  height: 72px;
+  perspective: 600px;
+}
+
+.dice-cube {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.4s ease-out;
+}
+
+.dice-cube.rolling {
+  animation: dice-spin 0.6s linear infinite;
+}
+
+@keyframes dice-spin {
+  from {
+    transform:
+      rotate3d(
+        var(--ax),
+        var(--ay),
+        var(--az),
+        0deg
+      );
+  }
+  to {
+    transform:
+      rotate3d(
+        var(--ax),
+        var(--ay),
+        var(--az),
+        720deg
+      );
+  }
+}
+
+
+.face {
+  position: absolute;
+  width: 72px;
+  height: 72px;
+  background-size: cover;
+  background-position: center;
+}
+
+.front  { transform: rotateY(  0deg) translateZ(36px); background-image: url(img/dice1.png); }
+.back   { transform: rotateY(180deg) translateZ(36px); background-image: url(img/dice6.png); }
+.right  { transform: rotateY( 90deg) translateZ(36px); background-image: url(img/dice3.png); }
+.left   { transform: rotateY(-90deg) translateZ(36px); background-image: url(img/dice4.png); }
+.top    { transform: rotateX( 90deg) translateZ(36px); background-image: url(img/dice5.png); }
+.bottom { transform: rotateX(-90deg) translateZ(36px); background-image: url(img/dice2.png); }
+
+#turnInfo {
+  font-size: 20px;
+  text-align: center;
+}
+
+#result {
+  background: #0f3327;
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 12px;
+}
+
+#log {
+  background: #0b261d;
+  border-radius: 8px;
+  padding: 8px;
+  margin-top: 12px;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+#app {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 16px 12px 24px;
+}
+
+#gameHeader {
+  text-align: center;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: rgba(234, 255, 246, 0.8);
+}
+
+#versionLabel {
+  padding: 4px 12px;
+  border-radius: 14px;
+  background: rgba(47, 220, 140, 0.15);
+  border: 1px solid rgba(47, 220, 140, 0.4);
+}
+
