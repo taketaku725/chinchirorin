@@ -6,7 +6,7 @@ if (playerConfig.length === 0) {
 
 renderPlayerSetup(playerConfig);
 
-document.getElementById("addPlayerBtn").onclick = () => {
+function addPlayer() {
   const input = document.getElementById("newPlayerName");
   const name = input.value.trim();
   if (!name) return;
@@ -16,9 +16,18 @@ document.getElementById("addPlayerBtn").onclick = () => {
   renderPlayerSetup(playerConfig);
 
   input.value = "";
-};
+}
 
 document.getElementById("startBtn").onclick = () => {
+
+const input = document.getElementById("newPlayerName");
+
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    addPlayer();
+  }
+});
 
   GameState.loggedYaku.clear();
   GameState.redoQueue = [];
