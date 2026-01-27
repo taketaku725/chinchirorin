@@ -18,6 +18,8 @@ function addPlayer() {
   input.value = "";
 }
 
+document.getElementById("addPlayerBtn").onclick = addPlayer;
+
 const input = document.getElementById("newPlayerName");
 input.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
