@@ -257,3 +257,7 @@ button:disabled {
   background: rgba(47, 220, 140, 0.15);
   border: 1px solid rgba(47, 220, 140, 0.4);
 }
+
+#newPlayerName {
+  font-size: 16px;
+}
