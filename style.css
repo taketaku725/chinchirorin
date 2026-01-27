@@ -115,6 +115,7 @@ button:disabled {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.2;
 }
 
 .player-row .actions button {
@@ -127,6 +128,12 @@ button:disabled {
   font-size: 12px;
 }
 
+.player-row button {
+  min-height: 28px;
+  font-size: 12px;
+  padding: 2px 6px;
+}
+
 .player-row .actions {
   display: flex;
   gap: 4px;
@@ -136,6 +143,12 @@ button:disabled {
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+.player-row .order button {
+  min-height: 22px;
+  font-size: 11px;
+  padding: 0;
 }
 
 .setup-footer {
