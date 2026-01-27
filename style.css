@@ -147,6 +147,7 @@ button:disabled {
 
 .player-row .order button {
   min-height: 22px;
+  min-width: 32px;
   font-size: 11px;
   padding: 0;
 }
