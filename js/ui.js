@@ -1,12 +1,3 @@
-const EFFECT_TEXT = {
-  ALL_CHEERS: "みんなで乾杯",
-  NEIGHBOR: "左右と一緒に乾杯",
-  RETRY_LAST: "現状ドベが振り直し",
-  CHOOSE_ONE: "誰か一人と一緒に乾杯",
-  NULLIFY: "特殊効果無効",
-  REVOLUTION: "革命発動！",
-};
-
 function updateTurn() {
   const p = currentPlayer();
   document.getElementById("turnInfo").textContent =
