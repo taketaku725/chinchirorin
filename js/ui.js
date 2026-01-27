@@ -7,6 +7,18 @@ const EFFECT_TEXT = {
   REVOLUTION: "革命発動！",
 };
 
+playerConfig.forEach((p, i) => {
+  const row = document.createElement("div");
+  row.className = "player-row";
+
+  row.innerHTML = `
+    <button onclick="movePlayer(${i}, -1)">▲</button>
+    <button onclick="movePlayer(${i}, 1)">▼</button>
+    <span>${p.name}</span>
+    ...
+  `;
+});
+
 function updateTurn() {
   const p = currentPlayer();
   document.getElementById("turnInfo").textContent =
