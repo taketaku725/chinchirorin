@@ -10,7 +10,7 @@ const EFFECT_TEXT = {
 function updateTurn() {
   const p = currentPlayer();
   document.getElementById("turnInfo").textContent =
-    `${p.name} の番（${GameState.rollCount + 1}/3）`;
+    `${p.name} の番（${GameState.rollCount}/3）`;
 }
 
 function showResult(text) {
