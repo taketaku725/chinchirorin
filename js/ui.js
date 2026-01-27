@@ -38,8 +38,7 @@ function showSpecialEffects(effects) {
 
   effects.forEach(effect => {
     const div = document.createElement("div");
-    div.textContent =
-      EFFECT_TEXT[effect] ?? `特殊効果：${effect}`;
+    div.textContent = effect;
     area.appendChild(div);
   });
 }
