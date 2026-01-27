@@ -18,10 +18,7 @@ function addPlayer() {
   input.value = "";
 }
 
-document.getElementById("startBtn").onclick = () => {
-
 const input = document.getElementById("newPlayerName");
-
 input.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
@@ -31,17 +28,23 @@ input.addEventListener("keydown", (e) => {
 
 function movePlayer(index, dir) {
   const target = index + dir;
+
+  // 範囲外ガード
   if (target < 0 || target >= playerConfig.length) return;
 
-  // 配列を入れ替える
+  // 入れ替え
   [playerConfig[index], playerConfig[target]] =
     [playerConfig[target], playerConfig[index]];
 
+  // 保存＆再描画
   savePlayersConfig(playerConfig);
   renderPlayerSetup(playerConfig);
 }
 
+// ui.js から呼べるようにする
 window.movePlayer = movePlayer;
+
+document.getElementById("startBtn").onclick = () => {
 
   GameState.loggedYaku.clear();
   GameState.redoQueue = [];
@@ -262,7 +265,7 @@ document.getElementById("backToSetupBtn").onclick = () => {
   document.getElementById("game").classList.add("hidden");
   document.getElementById("setup").classList.remove("hidden");
   
-  GameState.roolCount = 0;
+  GameState.rollCount = 0;
 
   GameState.turnEffects = [];
   GameState.revolution = false;
