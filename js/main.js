@@ -252,9 +252,12 @@ document.getElementById("nextTurnBtn").onclick = () => {
   GameState.loggedYaku.clear();
   GameState.redoQueue = [];
   GameState.redoOriginTurn = null;
-  
+
+  // ★ 追加：特殊効果表示を消す
+  document.getElementById("effectResult").innerHTML = "";
+
   resetPlayersForNextTurn();
-  players.forEach(p => delete p.noRevolution); // ★ 追加
+  players.forEach(p => delete p.noRevolution);
   
   resetGameUI();
   updateTurn();
@@ -271,6 +274,8 @@ document.getElementById("backToSetupBtn").onclick = () => {
   GameState.loggedYaku.clear();
   GameState.redoQueue = [];
   GameState.redoOriginTurn = null;
+  
+  document.getElementById("effectResult").innerHTML = "";
 
   players.forEach(p => delete p.noRevolution);
 
