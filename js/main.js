@@ -187,9 +187,6 @@ document.getElementById("rollBtn").onclick = () => {
     p.yakuRank = y.rank;
     p.sub = y.sub ?? null;
 
-
-    GameState.loggedYaku.clear();
-
     let logText = `${p.name}：${displayYakuName}`;
     const mul = YAKU_MULTIPLIER[y.name] ?? y.mul ?? 1;
 
