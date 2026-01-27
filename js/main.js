@@ -29,6 +29,20 @@ input.addEventListener("keydown", (e) => {
   }
 });
 
+function movePlayer(index, dir) {
+  const target = index + dir;
+  if (target < 0 || target >= playerConfig.length) return;
+
+  // 配列を入れ替える
+  [playerConfig[index], playerConfig[target]] =
+    [playerConfig[target], playerConfig[index]];
+
+  savePlayersConfig(playerConfig);
+  renderPlayerSetup(playerConfig);
+}
+
+window.movePlayer = movePlayer;
+
   GameState.loggedYaku.clear();
   GameState.redoQueue = [];
   GameState.redoOriginTurn = null;
