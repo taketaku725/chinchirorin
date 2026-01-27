@@ -7,36 +7,6 @@ const EFFECT_TEXT = {
   REVOLUTION: "革命発動！",
 };
 
-playerConfig.forEach((p, i) => {
-  const row = document.createElement("div");
-  row.className = "player-row";
-
-  const isFirst = i === 0;
-  const isLast = i === playerConfig.length - 1;
-
-  row.innerHTML = `
-    <button
-      onclick="movePlayer(${i}, -1)"
-      ${isFirst ? "disabled" : ""}
-    >▲</button>
-
-    <button
-      onclick="movePlayer(${i}, 1)"
-      ${isLast ? "disabled" : ""}
-    >▼</button>
-
-    <span>${p.name}</span>
-
-    <button onclick="toggleActive(${i})">
-      ${p.active ? "休憩" : "復帰"}
-    </button>
-
-    <button onclick="removePlayer(${i})">削除</button>
-  `;
-
-  container.appendChild(row);
-});
-
 function updateTurn() {
   const p = currentPlayer();
   document.getElementById("turnInfo").textContent =
@@ -93,29 +63,48 @@ function renderPlayerSetup(list) {
     row.draggable = true;
     row.dataset.index = index;
 
+    const isFirst = index === 0;
+    const isLast = index === list.length - 1;
+
     row.innerHTML = `
+      <div class="order">
+        <button
+          onclick="movePlayer(${index}, -1)"
+          ${isFirst ? "disabled" : ""}
+        >▲</button>
+        <button
+          onclick="movePlayer(${index}, 1)"
+          ${isLast ? "disabled" : ""}
+        >▼</button>
+      </div>
+
       <span class="name">☰ ${p.name}</span>
+
       <div class="actions">
-        <button class="toggle">${p.active ? "休憩" : "復帰"}</button>
+        <button class="toggle">
+          ${p.active ? "休憩" : "復帰"}
+        </button>
         <button class="remove">×</button>
       </div>
     `;
 
-    // 休憩トグル
+    // --- 休憩 / 復帰 ---
     row.querySelector(".toggle").onclick = () => {
       p.active = !p.active;
       savePlayersConfig(list);
       renderPlayerSetup(list);
     };
 
-    // 削除
+    // --- 削除 ---
     row.querySelector(".remove").onclick = () => {
       list.splice(index, 1);
       savePlayersConfig(list);
       renderPlayerSetup(list);
     };
 
+    // --- ドラッグ並び替え（補助） ---
     addDragHandlers(row, list);
+
     area.appendChild(row);
   });
 }
