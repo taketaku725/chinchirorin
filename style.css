@@ -8,6 +8,10 @@ body {
   color: #eafff6;
 }
 
+html, body {
+  touch-action: manipulation;
+}
+
 .title {
   text-align: center;
   letter-spacing: 0.1em;
@@ -39,6 +43,7 @@ button {
   min-height: 48px;
   font-size:16px;
   border-radius: 12px;
+  touch-action: manipulation;
 }
 
 button:disabled {
