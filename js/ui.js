@@ -11,12 +11,30 @@ playerConfig.forEach((p, i) => {
   const row = document.createElement("div");
   row.className = "player-row";
 
+  const isFirst = i === 0;
+  const isLast = i === playerConfig.length - 1;
+
   row.innerHTML = `
-    <button onclick="movePlayer(${i}, -1)">▲</button>
-    <button onclick="movePlayer(${i}, 1)">▼</button>
+    <button
+      onclick="movePlayer(${i}, -1)"
+      ${isFirst ? "disabled" : ""}
+    >▲</button>
+
+    <button
+      onclick="movePlayer(${i}, 1)"
+      ${isLast ? "disabled" : ""}
+    >▼</button>
+
     <span>${p.name}</span>
-    ...
+
+    <button onclick="toggleActive(${i})">
+      ${p.active ? "休憩" : "復帰"}
+    </button>
+
+    <button onclick="removePlayer(${i})">削除</button>
   `;
+
+  container.appendChild(row);
 });
 
 function updateTurn() {
