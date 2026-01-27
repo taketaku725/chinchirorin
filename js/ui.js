@@ -67,6 +67,15 @@ function renderPlayerSetup(list) {
     const isLast = index === list.length - 1;
 
     row.innerHTML = `
+      <span class="name">${p.name}</span>
+
+      <div class="actions">
+        <button class="toggle">
+          ${p.active ? "休憩" : "復帰"}
+        </button>
+        <button class="remove">×</button>
+      </div>
+
       <div class="order">
         <button
           onclick="movePlayer(${index}, -1)"
@@ -76,15 +85,6 @@ function renderPlayerSetup(list) {
           onclick="movePlayer(${index}, 1)"
           ${isLast ? "disabled" : ""}
         >▼</button>
-      </div>
-
-      <span class="name">☰ ${p.name}</span>
-
-      <div class="actions">
-        <button class="toggle">
-          ${p.active ? "休憩" : "復帰"}
-        </button>
-        <button class="remove">×</button>
       </div>
     `;
 
