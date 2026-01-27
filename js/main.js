@@ -106,6 +106,7 @@ document.getElementById("rollBtn").onclick = () => {
   // ② 出目はこの時点で確定（内部）
   const dice = rollDice();
   const sortedDice = [...dice].sort((a, b) => a - b);
+  // 判定用にソート（表示用 dice とは別）
   const y = judgeYaku(sortedDice);
 
   let displayYakuName = y.name;
