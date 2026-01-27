@@ -266,6 +266,25 @@ button:disabled {
   margin-top: 12px;
   max-height: 140px;
   overflow-y: auto;
+  scrollbar-width: thin;/* Firefox */
+  scrollbar-color: var(--green-main) #0b261d;
+}
+
+#log::-webkit-scrollbar {
+  width: 6px;
+}
+
+#log::-webkit-scrollbar-track {
+  background: #0b261d;
+}
+
+#log::-webkit-scrollbar-thumb {
+  background: var(--green-main);
+  border-radius: 4px;
+}
+
+#log::-webkit-scrollbar-thumb:hover {
+  background: #3ef0a4;
 }
 
 #app {
