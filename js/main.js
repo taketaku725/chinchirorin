@@ -133,7 +133,7 @@ document.getElementById("rollBtn").onclick = () => {
 
     // ★ バージョン1：目なし3投・合計一致の特例
     if (
-      GameState.version === 1 &&
+      GameState.version === 2 &&
       y.name === "目なし" &&
       GameState.rollCount === 3 &&
       p.sums.length === 3 &&
