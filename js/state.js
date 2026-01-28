@@ -8,4 +8,5 @@ const GameState = {
   redoOriginTurn: null,
   loggedYaku: new Set(),
   sanzoPending: false,
+  volumeLevel: 3,
 };
