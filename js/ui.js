@@ -9,9 +9,57 @@ function showResult(text) {
   document.getElementById("result").textContent = text;
 }
 
-function addLog(text) {
+function addLog(text, playerName, options = {}) {
   const log = document.getElementById("log");
-  log.innerHTML += `<div>${text}</div>`;
+
+  const div = document.createElement("div");
+  if (playerName) {
+    div.dataset.player = playerName;
+  }
+
+  // 倍率だけを包む（×は足さない）
+  if (options.weakMultiplier) {
+    const match = text.match(/（([^）]+)）/);
+    if (match) {
+      const inside = match[1]; // "×2" や "×7"
+      div.innerHTML =
+        text.replace(
+          `（${inside}）`,
+          `（<span class="mul weak">${inside}</span>）`
+        );
+    } else {
+      div.textContent = text;
+    }
+  } else {
+    div.textContent = text;
+  }
+
+  log.appendChild(div);
+}
+
+function highlightWeakestInLog() {
+  const log = document.getElementById("log");
+  const rows = log.querySelectorAll("div");
+
+  // 一旦全部リセット
+  rows.forEach(row => {
+    row.classList.remove("weakest");
+  });
+
+  // まだ確定してない人は除外
+  const confirmed = players.filter(p => p.yakuRank !== null);
+  if (confirmed.length < 2) return;
+
+  // ★ 既存ロジックをそのまま使う
+  const weakest = weakestPlayers(confirmed);
+  const weakestNames = weakest.map(p => p.name);
+
+  rows.forEach(row => {
+    const name = row.dataset.player;
+    if (weakestNames.includes(name)) {
+      row.classList.add("weakest");
+    }
+  });
 }
 
 function showFinalResult(weakest, cups) {
@@ -143,3 +191,20 @@ function addDragHandlers(row, list) {
     renderPlayerSetup(list);
   });
 }
+
+const soundBtn = document.getElementById("soundToggle");
+
+function updateSoundIcon() {
+  const level = GameState.volumeLevel;
+  soundBtn.style.backgroundImage =
+    `url(img/volume_${level}.png)`;
+}
+
+updateSoundIcon();
+
+soundBtn.onclick = () => {
+  GameState.volumeLevel =
+    (GameState.volumeLevel + 1) % 4;
+
+  updateSoundIcon();
+};
