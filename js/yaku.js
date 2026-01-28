@@ -9,15 +9,16 @@ const YAKU_MULTIPLIER = {
   "逆暴走": 2,
   "偶数ゾロ": 2,
   "ローゾロ": 5,
+  "？？？": 7,
 };
 
 const YAKU_V2 = {
-  111: { name: "111", rank: 2, mul: 1, effect: "ALL_CHEERS" },
-  222: { name: "222", rank: 3, mul: 2, effect: "NEIGHBOR" },
-  333: { name: "333", rank: 4, mul: 2, effect: "RETRY_LAST" },
-  444: { name: "444", rank: 5, mul: 2, effect: "CHOOSE_ONE" },
-  555: { name: "555", rank: 1, mul: 2, effect: "NULLIFY" },
-  666: { name: "666", rank: 6, mul: 2, effect: "REVOLUTION" },
+  111: { name: "ピンゾロ", rank: 2, mul: 1, effect: "ALL_CHEERS" },
+  222: { name: "ツーゾロ", rank: 3, mul: 2, effect: "NEIGHBOR" },
+  333: { name: "サンゾロ", rank: 4, mul: 2, effect: "RETRY_LAST" },
+  444: { name: "ヨンゾロ", rank: 5, mul: 2, effect: "CHOOSE_ONE" },
+  555: { name: "ゴゾロ", rank: 1, mul: 2, effect: "NULLIFY" },
+  666: { name: "ローゾロ", rank: 6, mul: 2, effect: "REVOLUTION" },
 };
 
 function judgeYaku(dice) {
@@ -57,11 +58,19 @@ function judgeYaku(dice) {
 
   // 暴走（135）
   if (a === 1 && b === 3 && c === 5) {
+    // ★ バージョン2では目なし扱い
+    if (GameState.version === 2) {
+      return { name: "目なし", rank: 10 };
+    }
     return { name: "暴走", rank: 2 };
   }
 
   // 逆暴走（246）
   if (a === 2 && b === 4 && c === 6) {
+    // ★ バージョン2では目なし扱い
+    if (GameState.version === 2) {
+      return { name: "目なし", rank: 10 };
+    }
     return { name: "逆暴走", rank: 12 };
   }
 
@@ -141,4 +150,3 @@ function calculateCups(players) {
 
   return cups;
 }
-
