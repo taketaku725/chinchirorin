@@ -94,6 +94,7 @@ document.getElementById("startBtn").onclick = () => {
 document.getElementById("rollBtn").onclick = () => {
   const p = currentPlayer();
 
+  playSE("roll");
   startDiceAnimation();
 
   document.getElementById("rollBtn").disabled = true;
@@ -253,7 +254,17 @@ document.getElementById("rollBtn").onclick = () => {
       GameState.loggedYaku.add(yakuKey);
     }
 
-    addLog(logText);
+    const confirmed = players.filter(pl => pl.yakuRank !== null);
+    const weakestNow =
+      confirmed.length >= 2
+        ? weakestPlayers(confirmed).map(w => w.name)
+        : [];
+
+    addLog(logText, p.name, {
+      weakMultiplier: weakestNow.includes(p.name)
+    });
+
+    highlightWeakestInLog();
 
     // redo が終わり、再開位置がある場合
     if (
