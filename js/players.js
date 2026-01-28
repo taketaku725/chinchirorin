@@ -9,6 +9,7 @@ function initPlayers(names) {
     yaku: null,
     yakuRank: null,
     sub: null,
+    sums: [],
   }));
 }
 
@@ -21,6 +22,8 @@ function resetPlayersForNextTurn() {
     p.yaku = null;
     p.yakuRank = null;
     p.sub = null;
+    p.sums = [];
+    delete p.mul;
   });
 }
 
