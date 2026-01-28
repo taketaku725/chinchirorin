@@ -1,5 +1,6 @@
 function updateTurn() {
   const p = currentPlayer();
+  if (!p.sums) p.sums = [];
   document.getElementById("turnInfo").textContent =
     `${p.name} の番（${GameState.rollCount + 1}/3）`;
 }
@@ -41,6 +42,17 @@ function showSpecialEffects(effects) {
     div.textContent = effect;
     area.appendChild(div);
   });
+}
+
+function showInstantMessage(text) {
+  const area = document.getElementById("instantMessage");
+  area.textContent = text;
+  area.classList.remove("hidden");
+}
+
+function clearInstantMessage() {
+  const area = document.getElementById("instantMessage");
+  area.textContent = "";
 }
 
 function renderPlayerSetup(list) {
@@ -131,4 +143,3 @@ function addDragHandlers(row, list) {
     renderPlayerSetup(list);
   });
 }
-
