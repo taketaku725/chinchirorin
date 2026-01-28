@@ -290,6 +290,17 @@ button:disabled {
   background: #3ef0a4;
 }
 
+#log div.weakest {
+  background: rgba(255, 255, 255, 0.2);
+  padding-left: 6px;
+  font-weight: 700;
+}
+
+#log .mul.weak {
+  color: #ff4d4d;
+  font-weight: 700;
+}
+
 #app {
   max-width: 420px;
   margin: 0 auto;
@@ -313,3 +324,17 @@ button:disabled {
 #newPlayerName {
   font-size: 16px;
 }
+
+#soundToggle {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+
+  width: 32px;
+  height: 32px;
+
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+}
+
