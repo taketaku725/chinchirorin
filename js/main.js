@@ -1,8 +1,8 @@
-let playerConfig = loadPlayersConfig();
+document.addEventListener("dblclick", e => {
+  e.preventDefault();
+}, { passive: false });
 
-if (playerConfig.length === 0) {
-  playerConfig.push({ name: "プレイヤー1", active: true });
-}
+let playerConfig = loadPlayersConfig();
 
 renderPlayerSetup(playerConfig);
 
@@ -47,7 +47,6 @@ function movePlayer(index, dir) {
 window.movePlayer = movePlayer;
 
 document.getElementById("startBtn").onclick = () => {
-
   GameState.loggedYaku.clear();
   GameState.redoQueue = [];
   GameState.redoOriginTurn = null;
@@ -95,7 +94,6 @@ document.getElementById("startBtn").onclick = () => {
 document.getElementById("rollBtn").onclick = () => {
   const p = currentPlayer();
 
-  GameState.rollCount++;
   startDiceAnimation();
 
   document.getElementById("rollBtn").disabled = true;
@@ -105,7 +103,11 @@ document.getElementById("rollBtn").onclick = () => {
 
   // ② 出目はこの時点で確定（内部）
   const dice = rollDice();
+  const sum = dice.reduce((a, b) => a + b, 0);
+  p.sums.push(sum);
+  GameState.rollCount++;
   const sortedDice = [...dice].sort((a, b) => a - b);
+
   // 判定用にソート（表示用 dice とは別）
   const y = judgeYaku(sortedDice);
 
@@ -124,10 +126,45 @@ document.getElementById("rollBtn").onclick = () => {
   // ④ 停止後に結果処理（完全に分離）
   setTimeout(() => {
 
-    showResult(`${dice.join(",")} → ${displayYakuName}`);
+    showResult(`出目：${dice.join(",")} ／ 役：${displayYakuName}`);
 
     const isConfirmed =
       y.name !== "目なし" || GameState.rollCount === 3;
+
+    // ★ バージョン1：目なし3投・合計一致の特例
+    if (
+      GameState.version === 1 &&
+      y.name === "目なし" &&
+      GameState.rollCount === 3 &&
+      p.sums.length === 3 &&
+      p.sums[0] === p.sums[1] &&
+      p.sums[1] === p.sums[2]
+    ) {
+      // 最弱に強制
+      p.yaku = "？？？";
+      p.yakuRank = -999;   // 既存の最弱ロジックに任せる
+      p.sub = null;
+    
+      // 次の人へ
+      GameState.turn++;
+      GameState.rollCount = 0;
+      p.sums = [];
+    
+      // ターン終了処理（最終結果 or 次）
+      if (GameState.turn >= players.length) {
+        const weakest = weakestPlayers(players);
+        const cups = calculateCups(players);
+        showFinalResult(weakest, cups);
+        showNextTurnButton();
+        showBackToSetup();
+        return;
+      }
+
+      updateTurn();
+      document.getElementById("rollBtn").disabled = false;
+      return; // ★ 通常処理を止める
+    }
+
 
     if (!isConfirmed) {
       document.getElementById("rollBtn").disabled = false;
@@ -136,52 +173,53 @@ document.getElementById("rollBtn").onclick = () => {
     }
 
     // --- 確定処理 ---
+    
 
     if (GameState.version === 2 && y.name === "ピンゾロ") {
-      GameState.turnEffects.push("ピンゾロ！みんなで乾杯！");
+      GameState.turnEffects.push(
+        `ピンゾロ！みんなで乾杯！`
+      );
     }
 
-    if (GameState.version === 2 && y.name === "222") {
+    if (GameState.version === 2 && y.name === "ツーゾロ") {
       GameState.turnEffects.push(
         `${p.name}は左右の人と一緒に乾杯！`
       );
     }
 
-    if (GameState.version === 2 && y.name === "333") {
+    if (GameState.version === 2 && y.name === "サンゾロ") {
 
-      // この時点での「最弱」を取得
-      const weakestNow = weakestPlayers(players);
-    
-      // 表示（人数分）
+      const confirmed = players.filter(p => p.yakuRank !== null);
+      const weakestNow = weakestPlayers(confirmed);
+
       weakestNow.forEach(pw => {
-        GameState.turnEffects.push(
-          `${pw.name}振り直し`
-        );
+        showInstantMessage(`${pw.name} 振り直し！`);
       });
     
-      // 振り直しキューを作る（順番保持）
       GameState.redoQueue = weakestNow.map(pw =>
         players.indexOf(pw)
       );
-    
-      // 再開位置（サンゾロを出した人の次）
+
       GameState.redoOriginTurn = GameState.turn + 1;
+    
+      // ★ サンゾロ待機中
+      GameState.sanzoPending = true;
     }
         
-    if (GameState.version === 2 && y.name === "444") {
+    if (GameState.version === 2 && y.name === "ヨンゾロ") {
       GameState.turnEffects.push(
         `${p.name}は好きな誰かと乾杯！`
       );
     }
 
-    if (GameState.version === 2 && y.name === "555") {
+    if (GameState.version === 2 && y.name === "ゴゾロ") {
       GameState.turnEffects.push(
         `${p.name}は特殊効果を受け付けない！`
       );
       p.noRevolution = true;
     }
 
-    if (GameState.version === 2 && y.name === "666") {
+    if (GameState.version === 2 && y.name === "ローゾロ") {
       GameState.revolution = true;
       GameState.turnEffects.push("革命！");
     }
@@ -189,13 +227,30 @@ document.getElementById("rollBtn").onclick = () => {
     p.yaku = y.name;
     p.yakuRank = y.rank;
     p.sub = y.sub ?? null;
+    p.mul = y.mul ?? 1;
 
+    if (GameState.sanzoPending && GameState.redoQueue.length >= 0) {
+      // この確定が「振り直しプレイヤーの確定」なら消す
+      clearInstantMessage();
+      GameState.sanzoPending = false;
+    }
+
+
+    // ★ 内部判定用キー（倍率・loggedYaku 用）
+    const yakuKey = p.yaku ?? y.name;
+
+    // ★ 表示用（目ありは数字、？？？は？？？）
     let logText = `${p.name}：${displayYakuName}`;
-    const mul = YAKU_MULTIPLIER[y.name] ?? y.mul ?? 1;
 
-    if (mul !== 1 && !GameState.loggedYaku.has(y.name)) {
+    const mul =
+      p.specialMul ??
+      YAKU_MULTIPLIER[yakuKey] ??
+      y.mul ??
+      1;
+
+    if (mul !== 1 && !GameState.loggedYaku.has(yakuKey)) {
       logText += `（×${mul}）`;
-      GameState.loggedYaku.add(y.name);
+      GameState.loggedYaku.add(yakuKey);
     }
 
     addLog(logText);
@@ -225,6 +280,7 @@ document.getElementById("rollBtn").onclick = () => {
     // 通常の次ターン
     GameState.turn++;
     GameState.rollCount = 0;
+    p.sums = [];
     
     if (GameState.turn >= players.length) {
       const weakest = weakestPlayers(players);
@@ -247,10 +303,9 @@ document.getElementById("rollBtn").onclick = () => {
 document.getElementById("nextTurnBtn").onclick = () => {
   GameState.turn = 0;
   GameState.rollCount = 0;
-  
+  GameState.loggedYaku.clear();
   GameState.turnEffects = [];
   GameState.revolution = false;
-  GameState.loggedYaku.clear();
   GameState.redoQueue = [];
   GameState.redoOriginTurn = null;
 
@@ -258,7 +313,11 @@ document.getElementById("nextTurnBtn").onclick = () => {
   document.getElementById("effectResult").innerHTML = "";
 
   resetPlayersForNextTurn();
-  players.forEach(p => delete p.noRevolution);
+  players.forEach(p => {
+    delete p.noRevolution;
+    delete p.specialMul;
+    p.sums = [];
+  });
   
   resetGameUI();
   updateTurn();
@@ -272,15 +331,17 @@ document.getElementById("backToSetupBtn").onclick = () => {
 
   GameState.turnEffects = [];
   GameState.revolution = false;
-  GameState.loggedYaku.clear();
   GameState.redoQueue = [];
   GameState.redoOriginTurn = null;
   
   document.getElementById("effectResult").innerHTML = "";
 
-  players.forEach(p => delete p.noRevolution);
+  players.forEach(p => {
+    delete p.noRevolution;
+    delete p.specialMul;
+    p.sums = [];
+  });
 
   resetGameUI();
   document.getElementById("backToSetupBtn").classList.add("hidden");
 };
-
