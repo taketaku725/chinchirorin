@@ -26,15 +26,12 @@ const cubes = [
 ];
 
 function randomAxis() {
-  // -1 ～ 1 の範囲で
-  let x = Math.random() * 2 - 1;
-  let y = Math.random() * 2 - 1;
-  let z = Math.random() * 2 - 1;
+  // 必ず斜めになるように固定レンジを使う
+  const sign = () => (Math.random() < 0.5 ? -1 : 1);
 
-  // ゼロベクトル回避
-  if (Math.abs(x) + Math.abs(y) + Math.abs(z) < 0.3) {
-    z = 1;
-  }
+  const x = (0.4 + Math.random() * 0.6) * sign();
+  const y = (0.4 + Math.random() * 0.6) * sign();
+  const z = (0.4 + Math.random() * 0.6) * sign();
 
   return { x, y, z };
 }
