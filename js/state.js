@@ -7,4 +7,5 @@ const GameState = {
   redoQueue: [],
   redoOriginTurn: null,
   loggedYaku: new Set(),
+  sanzoPending: false,
 };
