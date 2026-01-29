@@ -6,10 +6,27 @@ let playerConfig = loadPlayersConfig();
 
 renderPlayerSetup(playerConfig);
 
+function getNameWidth(str) {
+  let width = 0;
+  for (const ch of str) {
+    if (ch.match(/[^\x00-\x7F]/)) {
+      width += 2;
+    } else {
+      width += 1;
+    }
+  }
+  return width;
+}
+
 function addPlayer() {
   const input = document.getElementById("newPlayerName");
   const name = input.value.trim();
   if (!name) return;
+
+  if (getNameWidth(name) > 12) {
+    alert("プレイヤー名は全角6文字 / 半角12文字までです");
+    return;
+  }
 
   playerConfig.push({ name, active: true });
   savePlayersConfig(playerConfig);
@@ -62,9 +79,6 @@ document.getElementById("startBtn").onclick = () => {
     return;
   }
 
-  GameState.version =
-    Number(document.getElementById("version").value);
-
   // ★ ② ここで players を確定させる
   initPlayers(activeNames);
 
@@ -90,226 +104,246 @@ document.getElementById("startBtn").onclick = () => {
   updateTurn();
 };
 
+const rollBtn = document.getElementById("rollBtn");
 
 document.getElementById("rollBtn").onclick = () => {
+  if (GameState.autoRoll && this.disabled) return;
+
   const p = currentPlayer();
 
   playSE("roll");
-  startDiceAnimation();
-
   document.getElementById("rollBtn").disabled = true;
 
-  // ① 回り始める
-
-
-  // ② 出目はこの時点で確定（内部）
+  // ① 出目は先に確定
   const dice = rollDice();
   const sum = dice.reduce((a, b) => a + b, 0);
   p.sums.push(sum);
   GameState.rollCount++;
+
   const sortedDice = [...dice].sort((a, b) => a - b);
-
-  // 判定用にソート（表示用 dice とは別）
   const y = judgeYaku(sortedDice);
-
+    
+  // 表示名
   let displayYakuName = y.name;
-
-  // ★ 目ありは数字だけ表示
   if (y.name === "目あり" && y.sub != null) {
     displayYakuName = `${y.sub}`;
   }
 
-  // ③ 約1秒後に一斉停止
+  // ② 演出スキップ分岐
+  if (GameState.skipAnimation) {
+    stopDiceImmediately(dice);
+    handleRollResult(dice, y, displayYakuName);
+    return;
+  }
+  
+  // ③ 通常演出
+  startDiceAnimation();
+  
   setTimeout(() => {
     stopDiceAnimation(dice);
   }, 1000);
 
-  // ④ 停止後に結果処理（完全に分離）
   setTimeout(() => {
+    handleRollResult(dice, y, displayYakuName);
+  }, 1200);
+};
 
-    showResult(`出目：${dice.join(",")} ／ 役：${displayYakuName}`);
+function handleRollResult(dice, y, displayYakuName) {
+  const p = currentPlayer();
 
-    const isConfirmed =
-      y.name !== "目なし" || GameState.rollCount === 3;
+  showResult(`出目：${dice.join(",")} ／ 役：${displayYakuName}`);
 
-    // ★ バージョン1：目なし3投・合計一致の特例
-    if (
-      GameState.version === 2 &&
-      y.name === "目なし" &&
-      GameState.rollCount === 3 &&
-      p.sums.length === 3 &&
-      p.sums[0] === p.sums[1] &&
-      p.sums[1] === p.sums[2]
-    ) {
-      // 最弱に強制
-      p.yaku = "？？？";
-      p.yakuRank = -999;   // 既存の最弱ロジックに任せる
-      p.sub = null;
-    
-      // 次の人へ
-      GameState.turn++;
-      GameState.rollCount = 0;
-      p.sums = [];
-    
-      // ターン終了処理（最終結果 or 次）
-      if (GameState.turn >= players.length) {
-        const weakest = weakestPlayers(players);
-        const cups = calculateCups(players);
-        showFinalResult(weakest, cups);
-        showNextTurnButton();
-        showBackToSetup();
-        return;
-      }
+  const isConfirmed =
+    y.name !== "目なし" || GameState.rollCount === 3;
 
-      updateTurn();
-      document.getElementById("rollBtn").disabled = false;
-      return; // ★ 通常処理を止める
-    }
+  // ★ バージョン2：目なし3投・合計一致の特例
+  if (
+    GameState.version === 2 &&
+    y.name === "目なし" &&
+    GameState.rollCount === 3 &&
+    p.sums.length === 3 &&
+    p.sums[0] === p.sums[1] &&
+    p.sums[1] === p.sums[2]
+  ) {
+    p.yaku = "？？？";
+    p.yakuRank = -999;
+    p.sub = null;
+    p.mul = 7;
 
-
-    if (!isConfirmed) {
-      document.getElementById("rollBtn").disabled = false;
-      updateTurn();
-      return;
-    }
-
-    // --- 確定処理 ---
-    
-
-    if (GameState.version === 2 && y.name === "ピンゾロ") {
-      GameState.turnEffects.push(
-        `ピンゾロ！みんなで乾杯！`
-      );
-    }
-
-    if (GameState.version === 2 && y.name === "ツーゾロ") {
-      GameState.turnEffects.push(
-        `${p.name}は左右の人と一緒に乾杯！`
-      );
-    }
-
-    if (GameState.version === 2 && y.name === "サンゾロ") {
-
-      const confirmed = players.filter(p => p.yakuRank !== null);
-      const weakestNow = weakestPlayers(confirmed);
-
-      weakestNow.forEach(pw => {
-        showInstantMessage(`${pw.name} 振り直し！`);
-      });
-    
-      GameState.redoQueue = weakestNow.map(pw =>
-        players.indexOf(pw)
-      );
-
-      GameState.redoOriginTurn = GameState.turn + 1;
-    
-      // ★ サンゾロ待機中
-      GameState.sanzoPending = true;
-    }
-        
-    if (GameState.version === 2 && y.name === "ヨンゾロ") {
-      GameState.turnEffects.push(
-        `${p.name}は好きな誰かと乾杯！`
-      );
-    }
-
-    if (GameState.version === 2 && y.name === "ゴゾロ") {
-      GameState.turnEffects.push(
-        `${p.name}は特殊効果を受け付けない！`
-      );
-      p.noRevolution = true;
-    }
-
-    if (GameState.version === 2 && y.name === "ローゾロ") {
-      GameState.revolution = true;
-      GameState.turnEffects.push("革命！");
-    }
-    
-    p.yaku = y.name;
-    p.yakuRank = y.rank;
-    p.sub = y.sub ?? null;
-    p.mul = y.mul ?? 1;
-
-    if (GameState.sanzoPending && GameState.redoQueue.length >= 0) {
-      // この確定が「振り直しプレイヤーの確定」なら消す
-      clearInstantMessage();
-      GameState.sanzoPending = false;
-    }
-
-
-    // ★ 内部判定用キー（倍率・loggedYaku 用）
-    const yakuKey = p.yaku ?? y.name;
-
-    // ★ 表示用（目ありは数字、？？？は？？？）
-    let logText = `${p.name}：${displayYakuName}`;
-
-    const mul =
-      p.specialMul ??
-      YAKU_MULTIPLIER[yakuKey] ??
-      y.mul ??
-      1;
-
-    if (mul !== 1 && !GameState.loggedYaku.has(yakuKey)) {
-      logText += `（×${mul}）`;
-      GameState.loggedYaku.add(yakuKey);
-    }
-
-    const confirmed = players.filter(pl => pl.yakuRank !== null);
-    const weakestNow =
-      confirmed.length >= 2
-        ? weakestPlayers(confirmed).map(w => w.name)
-        : [];
-
-    addLog(logText, p.name, {
-      weakMultiplier: weakestNow.includes(p.name)
-    });
-
-    highlightWeakestInLog();
-
-    // redo が終わり、再開位置がある場合
-    if (
-      GameState.redoQueue.length === 0 &&
-      GameState.redoOriginTurn !== null
-    ) {
-      GameState.turn = GameState.redoOriginTurn;
-      GameState.redoOriginTurn = null;
-    }
-
-    /// ★ 振り直しキューがある場合はそちらを優先
-    if (GameState.redoQueue.length > 0) {
-
-      GameState.turn = GameState.redoQueue.shift();
-
-      // ★【ここ】redo でも必ず 0 に戻す
-      GameState.rollCount = 0;
-    
-      document.getElementById("rollBtn").disabled = false;
-      updateTurn();
-      return;
-    }
-    
-    // 通常の次ターン
     GameState.turn++;
     GameState.rollCount = 0;
     p.sums = [];
-    
+
     if (GameState.turn >= players.length) {
       const weakest = weakestPlayers(players);
       const cups = calculateCups(players);
-    
       showFinalResult(weakest, cups);
-      showSpecialEffects(GameState.turnEffects);
-    
       showNextTurnButton();
       showBackToSetup();
       return;
     }
 
     updateTurn();
-
     document.getElementById("rollBtn").disabled = false;
-  }, 1200);
-};
+    return;
+  }
+
+  if (!isConfirmed) {
+    document.getElementById("rollBtn").disabled = false;
+    updateTurn();
+    scheduleAutoRoll();
+    return;
+  }
+
+  // --- 確定処理 ---
+    
+
+  if (GameState.version === 2 && y.name === "ピンゾロ") {
+    GameState.turnEffects.push(
+      `ピンゾロ！みんなで乾杯！`
+    );
+  }
+
+  if (GameState.version === 2 && y.name === "ツーゾロ") {
+    GameState.turnEffects.push(
+      `${p.name}は左右の人と一緒に乾杯！`
+    );
+  }
+
+  if (GameState.version === 2 && y.name === "サンゾロ") {
+
+    const confirmed = players.filter(p => p.yakuRank !== null);
+    const weakestNow = weakestPlayers(confirmed);
+
+    weakestNow.forEach(pw => {
+      showInstantMessage(`${pw.name} 振り直し！`);
+    });
+    
+    GameState.redoQueue = weakestNow.map(pw =>
+      players.indexOf(pw)
+    );
+
+    GameState.redoOriginTurn = GameState.turn + 1;
+    
+    // ★ サンゾロ待機中
+    GameState.sanzoPending = true;
+  }
+        
+  if (GameState.version === 2 && y.name === "ヨンゾロ") {
+    GameState.turnEffects.push(
+      `${p.name}は好きな誰かと乾杯！`
+    );
+  }
+
+  if (GameState.version === 2 && y.name === "ゴゾロ") {
+    GameState.turnEffects.push(
+      `${p.name}は特殊効果を受け付けない！`
+    );
+    p.noRevolution = true;
+  }
+
+  if (GameState.version === 2 && y.name === "ローゾロ") {
+    GameState.revolution = true;
+    GameState.turnEffects.push("革命！");
+  }
+    
+  p.yaku = y.name;
+  p.yakuRank = y.rank;
+  p.sub = y.sub ?? null;
+  p.mul = y.mul ?? 1;
+
+  if (GameState.sanzoPending && GameState.redoQueue.length >= 0) {
+    // この確定が「振り直しプレイヤーの確定」なら消す
+    clearInstantMessage();
+    GameState.sanzoPending = false;
+  }
+
+
+  // ★ 内部判定用キー（倍率・loggedYaku 用）
+  const yakuKey = p.yaku ?? y.name;
+
+  // ★ 表示用（目ありは数字、？？？は？？？）
+  let logText = `${p.name}：${displayYakuName}`;
+
+  const mul =
+    p.specialMul ??
+    (GameState.version === 2
+      ? p.mul
+      : YAKU_MULTIPLIER[yakuKey]) ??
+    1;
+
+  if (mul !== 1 && !GameState.loggedYaku.has(yakuKey)) {
+    logText += `（×${mul}）`;
+    GameState.loggedYaku.add(yakuKey);
+  }
+
+  const confirmed = players.filter(pl => pl.yakuRank !== null);
+  const weakestNow =
+    confirmed.length >= 2
+      ? weakestPlayers(confirmed).map(w => w.name)
+      : [];
+   addLog(logText, p.name, {
+    weakMultiplier: weakestNow.includes(p.name)
+  });
+
+  highlightWeakestInLog();
+
+  // redo が終わり、再開位置がある場合
+  if (
+    GameState.redoQueue.length === 0 &&
+    GameState.redoOriginTurn !== null
+  ) {
+    GameState.turn = GameState.redoOriginTurn;
+    GameState.redoOriginTurn = null;
+  }
+
+  /// ★ 振り直しキューがある場合はそちらを優先
+  if (GameState.redoQueue.length > 0) {
+
+    GameState.turn = GameState.redoQueue.shift();
+
+    // ★【ここ】redo でも必ず 0 に戻す
+    GameState.rollCount = 0;
+    
+    document.getElementById("rollBtn").disabled = false;
+    updateTurn();
+    return;
+  }
+    
+  // 通常の次ターン
+  GameState.turn++;
+  GameState.rollCount = 0;
+  p.sums = [];
+    
+  if (GameState.turn >= players.length) {
+    const weakest = weakestPlayers(players);
+    const cups = calculateCups(players);
+    
+    showFinalResult(weakest, cups);
+    showSpecialEffects(GameState.turnEffects);
+  
+    showNextTurnButton();
+    showBackToSetup();
+    return;
+  }
+
+  updateTurn();
+
+  document.getElementById("rollBtn").disabled = false;
+
+}
+
+function scheduleAutoRoll() {
+  if (!GameState.autoRoll) return;
+
+  // まだ確定していないなら次を振る
+  const p = currentPlayer();
+  if (p.yaku === null && GameState.rollCount < 3) {
+    setTimeout(() => {
+      document.getElementById("rollBtn").click();
+    }, GameState.skipAnimation ? 50 : 300);
+  }
+}
 
 document.getElementById("nextTurnBtn").onclick = () => {
   GameState.turn = 0;
