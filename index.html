@@ -15,13 +15,43 @@
     <section id="setup">
       <h1 class="title">酒粕チンチロ</h1>
 
-      <!-- ★ バージョン選択をタイトル直下へ -->
-      <div class="version-select">
-        <select id="version">
-          <option value="1">バージョン1</option>
-          <option value="2">バージョン2</option>
-        </select>
-      </div>
+      <section id="menu" class="menu-panel">
+
+        <!-- バージョン -->
+        <div class="menu-item">
+          <span class="menu-label">ゲームバージョン</span>
+          <div class="menu-segment" data-key="version">
+            <button data-value="1">V1</button>
+            <button data-value="2">V2</button>
+          </div>
+        </div>
+
+        <!-- 計算方法 -->
+        <div class="menu-item">
+          <span class="menu-label">計算方法</span>
+          <div class="menu-segment" data-key="calcMode">
+            <button data-value="all">全役</button>
+            <button data-value="strongWeak">最強×最弱</button>
+          </div>
+        </div>
+      
+        <!-- ON/OFF 系 -->
+        <div class="menu-item">
+          <span class="menu-label">演出スキップ</span>
+          <button class="menu-toggle" data-key="skipAnimation">OFF</button>
+        </div>
+      
+        <div class="menu-item">
+          <span class="menu-label">自動サイコロ</span>
+          <button class="menu-toggle" data-key="autoRoll">OFF</button>
+        </div>
+      
+        <div class="menu-item">
+          <span class="menu-label">追加ルール</span>
+          <button class="menu-toggle" data-key="extraRules">ON</button>
+        </div>
+
+      </section>
 
       <div class="setup-panel">
         <div class="input-row">
