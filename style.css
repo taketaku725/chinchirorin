@@ -112,6 +112,15 @@ button:disabled {
   filter: grayscale(60%);
 }
 
+.player-row .actions .remove {
+  width: 32px;
+  color: #ff4d4d;
+  border-color: #ff4d4d;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .player-row .name {
   font-weight: 600;
   flex: 1; /* ← これが肝 */
@@ -162,20 +171,75 @@ button:disabled {
   margin-top: 16px;
 }
 
-.version-select {
-  display: flex;
-  justify-content: center;
-  margin: 12px 0 8px;
+.menu-panel {
+  background: #0f3327;
+  border-radius: 12px;
+  padding: 12px;
+  margin: 12px auto;
+  max-width: 420px;
+  box-shadow: inset 0 0 0 1px #1aa36b;
 }
 
-.version-select select {
+.menu-panel {
   background: #0f3327;
-  color: #eafff6;
-  border: 1px solid var(--green-dark);
-  border-radius: 20px;
-  padding: 6px 14px;
-  font-size: 14px;
+  border-radius: 12px;
+  padding: 12px;
+  margin: 12px auto;
+  max-width: 420px;
+  box-shadow: inset 0 0 0 1px #1aa36b;
 }
+
+.menu-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 6px;
+}
+
+.menu-label {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+/* ON/OFF ボタン */
+.menu-toggle {
+  min-width: 64px;
+  height: 32px;
+  border-radius: 16px;
+  border: none;
+  background: #0b261d;
+  color: #8fdac0;
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px #1aa36b;
+}
+
+.menu-toggle.on {
+  background: #2fdc8c;
+  color: #062015;
+}
+
+/* 2択セグメント */
+.menu-segment {
+  display: flex;
+  background: #0b261d;
+  border-radius: 16px;
+  padding: 2px;
+}
+
+.menu-segment button {
+  border: none;
+  background: transparent;
+  color: #8fdac0;
+  padding: 6px 12px;
+  font-weight: 700;
+  border-radius: 14px;
+}
+
+.menu-segment button.active {
+  background: #2fdc8c;
+  color: #062015;
+}
+
 
 .start-btn {
   background: #2ecc71;
@@ -337,4 +401,3 @@ button:disabled {
   background-position: center;
   cursor: pointer;
 }
-
