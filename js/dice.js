@@ -1,3 +1,4 @@
+
 const DICE_ROTATION = {
   1: "rotateX(0deg) rotateY(0deg)",
   2: "rotateX(90deg) rotateY(0deg)",
@@ -65,4 +66,11 @@ function rollDice() {
 
 function rand() {
   return Math.floor(Math.random() * 6) + 1;
+}
+
+function stopDiceImmediately(result) {
+  cubes.forEach((cube, i) => {
+    cube.classList.remove("rolling");
+    cube.style.transform = DICE_ROTATION[result[i]];
+  });
 }
