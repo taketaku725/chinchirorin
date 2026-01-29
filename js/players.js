@@ -1,6 +1,5 @@
 const STORAGE_KEY = "sakakasu_players";
 
-
 let players = [];
 
 function initPlayers(names) {
