@@ -1,3 +1,48 @@
+function initToggles() {
+  document.querySelectorAll(".menu-toggle").forEach(btn => {
+    const key = btn.dataset.key;
+
+    function refresh() {
+      const on = GameState[key];
+      btn.textContent = on ? "ON" : "OFF";
+      btn.classList.toggle("on", on);
+    }
+
+    btn.onclick = () => {
+      GameState[key] = !GameState[key];
+      refresh();
+    };
+
+    refresh();
+  });
+}
+
+function initSegments() {
+  document.querySelectorAll(".menu-segment").forEach(seg => {
+    const key = seg.dataset.key;
+    const buttons = seg.querySelectorAll("button");
+
+    buttons.forEach(btn => {
+      btn.onclick = () => {
+        const val = btn.dataset.value;
+        GameState[key] =
+          key === "version" ? Number(val) : val;
+
+        buttons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+      };
+
+      // 初期状態
+      if (
+        String(GameState[key]) === btn.dataset.value
+      ) {
+        btn.classList.add("active");
+      }
+    });
+  });
+}
+
+
 function updateTurn() {
   const p = currentPlayer();
   if (!p.sums) p.sums = [];
@@ -159,6 +204,8 @@ function renderPlayerSetup(list) {
   });
 }
 
+
+
 function showBackToSetup() {
   document.getElementById("backToSetupBtn").classList.remove("hidden");
 }
@@ -200,11 +247,13 @@ function updateSoundIcon() {
     `url(img/volume_${level}.png)`;
 }
 
-updateSoundIcon();
-
 soundBtn.onclick = () => {
   GameState.volumeLevel =
     (GameState.volumeLevel + 1) % 4;
 
   updateSoundIcon();
 };
+
+initToggles();
+initSegments();
+updateSoundIcon();
