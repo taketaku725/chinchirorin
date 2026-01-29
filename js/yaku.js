@@ -76,13 +76,22 @@ function judgeYaku(dice) {
 
   // シゴロ
   if (a === 4 && b === 5 && c === 6) {
-    return { name: "シゴロ", rank: 3 };
+    return {
+      name: "シゴロ",
+      rank: 3,
+      mul: GameState.version === 2 ? 2 : undefined,
+    };
   }
 
   // ヒフミ
   if (a === 1 && b === 2 && c === 3) {
-    return { name: "ヒフミ", rank: 11 };
+    return {
+      name: "ヒフミ",
+      rank: 11,
+      mul: GameState.version === 2 ? 2 : undefined,
+    };
   }
+
 
   // 目あり
   if (a === b || b === c) {
@@ -141,10 +150,17 @@ function calculateCups(players) {
 
   uniqueYaku.forEach(yaku => {
     const p = players.find(pl => pl.yaku === yaku);
-    const mul =
-      YAKU_MULTIPLIER[yaku] ??
-      p?.mul ??
-      1;
+
+    let mul = 1;
+
+    if (GameState.version === 2) {
+      // ★ バージョン2：YAKU_V2.mul（= p.mul）を正とする
+      mul = p?.mul ?? 1;
+    } else {
+      // ★ バージョン1：従来通り
+      mul = YAKU_MULTIPLIER[yaku] ?? 1;
+    }
+
     cups *= mul;
   });
 
