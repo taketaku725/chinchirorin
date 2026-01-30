@@ -175,6 +175,10 @@ function handleRollResult(dice, y, displayYakuName) {
     p.sub = null;
     p.mul = 7;
     p.yakuRank = getYakuRank("？？？", null);
+    
+    // ★ ？？？ 確定ログを追加
+    const logText = `${p.name}：？？？（×7）`;
+    addLog(logText, p.name, { autoColor: true });
 
     GameState.turn++;
     GameState.rollCount = 0;
@@ -318,6 +322,9 @@ function handleRollResult(dice, y, displayYakuName) {
   ) {
     GameState.turn = GameState.redoOriginTurn;
     GameState.redoOriginTurn = null;
+
+    // ★ サンゾロ振り直し終了後は必ず復帰
+    document.getElementById("rollBtn").disabled = false;
   }
 
   /// ★ 振り直しキューがある場合はそちらを優先
