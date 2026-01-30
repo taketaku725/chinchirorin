@@ -194,14 +194,18 @@ function handleRollResult(dice, y, displayYakuName) {
     }
 
     updateTurn();
-    document.getElementById("rollBtn").disabled = false;
+    if (!GameState.pinzoroLock) {
+      document.getElementById("rollBtn").disabled = false;
+    }
     return;
   }
 
   if (!isConfirmed) {
     updateTurn();
 
-    document.getElementById("rollBtn").disabled = false;
+    if (!GameState.pinzoroLock) {
+      document.getElementById("rollBtn").disabled = false;
+    }
   
     scheduleAutoRoll();
     return;
@@ -218,18 +222,20 @@ function handleRollResult(dice, y, displayYakuName) {
   }
 
   if (
-    GameState.version === 2 &&
-    y.name === "ピンゾロ" &&
+　　  GameState.version === 2 &&
+　　  y.name === "ピンゾロ" &&
     !GameState.skipAnimation &&
     Math.random() < PINZORO_FLASH_PROB
-  ) {
+　　) {
     const btn = document.getElementById("rollBtn");
-  
-    pinzoroFlashing = true;
-  
-    btn.disabled = false;
+
+    GameState.pinzoroLock = true;
+    
+    if (!GameState.pinzoroLock) {
+      btn.disabled = false;
+    }
     btn.classList.add("pinzoro-flash");
-  
+
     setTimeout(() => {
       btn.classList.remove("pinzoro-flash");
       btn.disabled = true;
@@ -324,7 +330,9 @@ function handleRollResult(dice, y, displayYakuName) {
     GameState.redoOriginTurn = null;
 
     // ★ サンゾロ振り直し終了後は必ず復帰
-    document.getElementById("rollBtn").disabled = false;
+    if (!GameState.pinzoroLock) {
+      document.getElementById("rollBtn").disabled = false;
+    }
   }
 
   /// ★ 振り直しキューがある場合はそちらを優先
@@ -335,7 +343,9 @@ function handleRollResult(dice, y, displayYakuName) {
     // ★【ここ】redo でも必ず 0 に戻す
     GameState.rollCount = 0;
     
-    document.getElementById("rollBtn").disabled = false;
+    if (!GameState.pinzoroLock) {
+      document.getElementById("rollBtn").disabled = false;
+    }
     updateTurn();
     return;
   }
@@ -360,7 +370,9 @@ function handleRollResult(dice, y, displayYakuName) {
   updateTurn();
 
   if (!pinzoroFlashing) {
-    document.getElementById("rollBtn").disabled = false;
+    if (!GameState.pinzoroLock) {
+      document.getElementById("rollBtn").disabled = false;
+    }
 }
 
 
