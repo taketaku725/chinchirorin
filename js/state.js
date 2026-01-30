@@ -7,6 +7,7 @@ const GameState = {
 
   volumeLevel: 3,
 
+  pinzoroLock: false,
   turn: 0,
   rollCount: 0,
   turnEffects: [],
