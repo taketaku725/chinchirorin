@@ -1,3 +1,5 @@
+const PINZORO_FLASH_PROB = 0.9; // 30%（あとでここだけ変える）
+
 document.addEventListener("dblclick", e => {
   e.preventDefault();
 }, { passive: false });
@@ -109,10 +111,13 @@ const rollBtn = document.getElementById("rollBtn");
 document.getElementById("rollBtn").onclick = () => {
   if (GameState.autoRoll && this.disabled) return;
 
+  const btn = rollBtn;
+
+  btn.disabled = true;
+
   const p = currentPlayer();
 
   playSE("roll");
-  document.getElementById("rollBtn").disabled = true;
 
   // ① 出目は先に確定
   const dice = rollDice();
@@ -150,6 +155,7 @@ document.getElementById("rollBtn").onclick = () => {
 
 function handleRollResult(dice, y, displayYakuName) {
   const p = currentPlayer();
+  let pinzoroFlashing = false;
 
   showResult(`出目：${dice.join(",")} ／ 役：${displayYakuName}`);
 
@@ -166,9 +172,9 @@ function handleRollResult(dice, y, displayYakuName) {
     p.sums[1] === p.sums[2]
   ) {
     p.yaku = "？？？";
-    p.yakuRank = -999;
     p.sub = null;
     p.mul = 7;
+    p.yakuRank = getYakuRank("？？？", null);
 
     GameState.turn++;
     GameState.rollCount = 0;
@@ -189,11 +195,14 @@ function handleRollResult(dice, y, displayYakuName) {
   }
 
   if (!isConfirmed) {
-    document.getElementById("rollBtn").disabled = false;
     updateTurn();
+
+    document.getElementById("rollBtn").disabled = false;
+  
     scheduleAutoRoll();
     return;
   }
+
 
   // --- 確定処理 ---
     
@@ -204,10 +213,23 @@ function handleRollResult(dice, y, displayYakuName) {
     );
   }
 
-  if (GameState.version === 2 && y.name === "ツーゾロ") {
-    GameState.turnEffects.push(
-      `${p.name}は左右の人と一緒に乾杯！`
-    );
+  if (
+    GameState.version === 2 &&
+    y.name === "ピンゾロ" &&
+    !GameState.skipAnimation &&
+    Math.random() < PINZORO_FLASH_PROB
+  ) {
+    const btn = document.getElementById("rollBtn");
+  
+    pinzoroFlashing = true;
+  
+    btn.disabled = false;
+    btn.classList.add("pinzoro-flash");
+  
+    setTimeout(() => {
+      btn.classList.remove("pinzoro-flash");
+      btn.disabled = true;
+    }, 120);
   }
 
   if (GameState.version === 2 && y.name === "サンゾロ") {
@@ -239,7 +261,6 @@ function handleRollResult(dice, y, displayYakuName) {
     GameState.turnEffects.push(
       `${p.name}は特殊効果を受け付けない！`
     );
-    p.noRevolution = true;
   }
 
   if (GameState.version === 2 && y.name === "ローゾロ") {
@@ -248,9 +269,9 @@ function handleRollResult(dice, y, displayYakuName) {
   }
     
   p.yaku = y.name;
-  p.yakuRank = y.rank;
   p.sub = y.sub ?? null;
   p.mul = y.mul ?? 1;
+  p.yakuRank = getYakuRank(p.yaku, p.sub, p);
 
   if (GameState.sanzoPending && GameState.redoQueue.length >= 0) {
     // この確定が「振り直しプレイヤーの確定」なら消す
@@ -282,11 +303,13 @@ function handleRollResult(dice, y, displayYakuName) {
     confirmed.length >= 2
       ? weakestPlayers(confirmed).map(w => w.name)
       : [];
-   addLog(logText, p.name, {
-    weakMultiplier: weakestNow.includes(p.name)
+  addLog(logText, p.name, {
+    autoColor: true,
+    replace: true
   });
 
   highlightWeakestInLog();
+  refreshStrongWeakLog();
 
   // redo が終わり、再開位置がある場合
   if (
@@ -329,21 +352,32 @@ function handleRollResult(dice, y, displayYakuName) {
 
   updateTurn();
 
-  document.getElementById("rollBtn").disabled = false;
+  if (!pinzoroFlashing) {
+    document.getElementById("rollBtn").disabled = false;
+}
+
 
 }
 
 function scheduleAutoRoll() {
   if (!GameState.autoRoll) return;
 
-  // まだ確定していないなら次を振る
   const p = currentPlayer();
-  if (p.yaku === null && GameState.rollCount < 3) {
+
+  const isRedo =
+    GameState.sanzoPending &&
+    GameState.redoQueue.length >= 0;
+
+  if (
+    (p.yaku === null || isRedo) &&
+    GameState.rollCount < 3
+  ) {
     setTimeout(() => {
       document.getElementById("rollBtn").click();
     }, GameState.skipAnimation ? 50 : 300);
   }
 }
+
 
 document.getElementById("nextTurnBtn").onclick = () => {
   GameState.turn = 0;
@@ -359,7 +393,6 @@ document.getElementById("nextTurnBtn").onclick = () => {
 
   resetPlayersForNextTurn();
   players.forEach(p => {
-    delete p.noRevolution;
     delete p.specialMul;
     p.sums = [];
   });
@@ -382,7 +415,6 @@ document.getElementById("backToSetupBtn").onclick = () => {
   document.getElementById("effectResult").innerHTML = "";
 
   players.forEach(p => {
-    delete p.noRevolution;
     delete p.specialMul;
     p.sums = [];
   });
