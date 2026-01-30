@@ -365,6 +365,12 @@ button:disabled {
   font-weight: 700;
 }
 
+#log .mul.strong {
+  color: #ffd700;      /* 金 */
+  font-weight: 700;
+  text-shadow: 0 0 4px rgba(255, 215, 0, 0.5);
+}
+
 #app {
   max-width: 420px;
   margin: 0 auto;
@@ -400,4 +406,31 @@ button:disabled {
   background-size: cover;
   background-position: center;
   cursor: pointer;
+}
+
+@keyframes pinzoroPreFlash {
+  0% {
+    background-color: #4caf50; /* 通常緑 */
+    box-shadow: 0 0 0 rgba(255, 80, 80, 0);
+    transform: scale(1);
+  }
+  40% {
+    background-color: #ff3b3b;
+    box-shadow:
+      0 0 12px rgba(255, 80, 80, 0.9),
+      0 0 24px rgba(255, 80, 80, 0.6),
+      0 0 36px rgba(255, 80, 80, 0.3);
+    transform: scale(1.03);
+  }
+  100% {
+    background-color: #ff3b3b;
+    box-shadow:
+      0 0 18px rgba(255, 80, 80, 0.8),
+      0 0 32px rgba(255, 80, 80, 0.4);
+    transform: scale(1.02);
+  }
+}
+
+#rollBtn.pinzoro-preflash {
+  animation: pinzoroPreFlash 0.12s ease-out;
 }
