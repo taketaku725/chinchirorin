@@ -57,21 +57,54 @@ function showResult(text) {
 function addLog(text, playerName, options = {}) {
   const log = document.getElementById("log");
 
+  if (options.replace && playerName) {
+    const old = log.querySelector(
+      `div[data-player="${playerName}"]`
+    );
+    if (old) {
+      old.replaceWith(div);
+      return;
+    }
+  }
+
   const div = document.createElement("div");
+
   if (playerName) {
     div.dataset.player = playerName;
   }
 
-  // 倍率だけを包む（×は足さない）
-  if (options.weakMultiplier) {
-    const match = text.match(/（([^）]+)）/);
-    if (match) {
-      const inside = match[1]; // "×2" や "×7"
-      div.innerHTML =
-        text.replace(
-          `（${inside}）`,
-          `（<span class="mul weak">${inside}</span>）`
-        );
+  const match = text.match(/（×(\d+)）/);
+
+  if (match) {
+    const mul = Number(match[1]);
+    let className = "";
+
+    // ① 明示指定（最優先）
+    if (options.weakMultiplier) {
+      className = "weak";
+    } else if (options.strongMultiplier) {
+      className = "strong";
+    }
+
+    // ② 自動判定
+    else if (
+      options.autoColor &&
+      playerName &&
+      Array.isArray(players)
+    ) {
+      const p = players.find(pl => pl.name === playerName);
+      if (p) {
+        const { strongMax, weakMin } = getStrongWeakBoundary();
+        if (p.yakuRank <= strongMax) className = "strong";
+        if (p.yakuRank >= weakMin) className = "weak";
+      }
+    }
+
+    if (className) {
+      div.innerHTML = text.replace(
+        `（×${mul}）`,
+        `（<span class="mul ${className}">×${mul}</span>）`
+      );
     } else {
       div.textContent = text;
     }
@@ -80,6 +113,9 @@ function addLog(text, playerName, options = {}) {
   }
 
   log.appendChild(div);
+
+  // ★ ログ追加後、常に一番下へスクロール
+  log.scrollTop = log.scrollHeight;
 }
 
 function highlightWeakestInLog() {
@@ -104,6 +140,59 @@ function highlightWeakestInLog() {
     if (weakestNames.includes(name)) {
       row.classList.add("weakest");
     }
+  });
+}
+
+function refreshStrongWeakLog() {
+
+  const log = document.getElementById("log");
+
+  // まず全員の倍率表示を消す
+  log.querySelectorAll("div[data-player]").forEach(row => {
+    row.innerHTML = row.innerHTML.replace(/（<span class="mul.*?<\/span>）/, "");
+  });
+
+
+  // strongWeak モードじゃなければ終わり
+  if (GameState.calcMode !== "strongWeak") return;
+
+  // 確定者のみ
+  const confirmed = players.filter(p => p.yakuRank !== null);
+  if (confirmed.length === 0) return;
+
+  const { strongMax, weakMin } = getStrongWeakBoundary();
+
+  let strong, weak;
+
+  if (GameState.revolution) {
+    strong = confirmed
+      .filter(p => p.yakuRank >= weakMin)
+      .sort((a, b) => b.yakuRank - a.yakuRank)[0];
+  
+    weak = confirmed
+      .filter(p => p.yakuRank <= strongMax)
+      .sort((a, b) => a.yakuRank - b.yakuRank)[0];
+  } else {
+    strong = confirmed
+      .filter(p => p.yakuRank <= strongMax)
+      .sort((a, b) => a.yakuRank - b.yakuRank)[0];
+  
+    weak = confirmed
+      .filter(p => p.yakuRank >= weakMin)
+      .sort((a, b) => b.yakuRank - a.yakuRank)[0];
+  }
+
+  [strong, weak].forEach(p => {
+    if (!p) return;
+    const row = log.querySelector(
+      `div[data-player="${p.name}"]`
+    );
+    if (!row) return;
+
+    const mul = getPlayerMultiplier(p);
+    if (mul === 1) return;
+    const className = p === strong ? "strong" : "weak";
+    row.innerHTML += `（<span class="mul ${className}">×${mul}</span>）`;
   });
 }
 
@@ -257,3 +346,4 @@ soundBtn.onclick = () => {
 initToggles();
 initSegments();
 updateSoundIcon();
+
