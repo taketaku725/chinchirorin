@@ -44,6 +44,7 @@ function initSegments() {
 
 
 function updateTurn() {
+  GameState.pinzoroLock = false;
   const p = currentPlayer();
   if (!p.sums) p.sums = [];
   document.getElementById("turnInfo").textContent =
