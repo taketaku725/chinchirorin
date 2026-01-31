@@ -178,7 +178,10 @@ function handleRollResult(dice, y, displayYakuName) {
     
     // ★ ？？？ 確定ログを追加
     const logText = `${p.name}：？？？（×7）`;
-    addLog(logText, p.name, { autoColor: true });
+    addLog(logText, p.name, { 
+      autoColor: true,
+      replace: true
+    });
 
     GameState.turn++;
     GameState.rollCount = 0;
@@ -283,7 +286,7 @@ function handleRollResult(dice, y, displayYakuName) {
   p.mul = y.mul ?? 1;
   p.yakuRank = getYakuRank(p.yaku, p.sub, p);
 
-  if (GameState.sanzoPending && GameState.redoQueue.length >= 0) {
+  if (GameState.sanzoPending && GameState.redoQueue.length === 0) {
     // この確定が「振り直しプレイヤーの確定」なら消す
     clearInstantMessage();
     GameState.sanzoPending = false;
@@ -328,6 +331,8 @@ function handleRollResult(dice, y, displayYakuName) {
   ) {
     GameState.turn = GameState.redoOriginTurn;
     GameState.redoOriginTurn = null;
+    
+    rollBtn.disable = false;
 
     // ★ サンゾロ振り直し終了後は必ず復帰
     if (!GameState.pinzoroLock) {
@@ -385,7 +390,7 @@ function scheduleAutoRoll() {
 
   const isRedo =
     GameState.sanzoPending &&
-    GameState.redoQueue.length >= 0;
+    GameState.redoQueue.length > 0;
 
   if (
     (p.yaku === null || isRedo) &&
