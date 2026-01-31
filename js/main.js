@@ -245,6 +245,12 @@ function handleRollResult(dice, y, displayYakuName) {
     }, 120);
   }
 
+  if (GameState.version === 2 && y.name === "ツーゾロ") {
+    GameState.turnEffects.push(
+      `${p.name}は左右の人と乾杯！`
+    );
+  }
+
   if (GameState.version === 2 && y.name === "サンゾロ") {
 
     const confirmed = players.filter(p => p.yakuRank !== null);
