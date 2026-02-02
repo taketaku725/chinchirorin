@@ -6,8 +6,8 @@ const YAKU_MULTIPLIER = {
   "目あり": 1,
   "目なし": 1,
   "ヒフミ": 2,
-  "逆暴走": 2,
-  "偶数ゾロ": 2,
+  "逆暴走": 3,
+  "偶数ゾロ": 3,
   "ローゾロ": 5,
 };
 
@@ -153,7 +153,7 @@ function getRankV2(name, sub) {
     case "ツーゾロ": 
     case "ヨンゾロ": return 13;
     case "ローゾロ": return 14;
-    case "？？？": return 15;
+    case "？？？": return 0;
   }
 
   if (name === "目あり") {
