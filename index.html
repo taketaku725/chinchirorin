@@ -15,13 +15,16 @@
 
     <!-- セットアップ -->
     <section id="setup">
-      <h1 class="title">酒粕チンチロ β001</h1>
+      <h1 class="title">酒粕チンチロ β002</h1>
 
       <section id="menu" class="menu-panel">
 
         <!-- バージョン -->
         <div class="menu-item">
-          <span class="menu-label">ゲームバージョン</span>
+          <span class="menu-label">
+            ゲームバージョン
+            <button id="yakuHelpBtn" class="help-btn">？</button>
+          </span>
           <div class="menu-segment" data-key="version">
             <button data-value="1">V1</button>
             <button data-value="2">V2</button>
@@ -118,11 +121,23 @@
       <div id="instantMessage"></div>
       <div id="log"></div>
 
+      <div id="yakuHelpInline"></div>
+
       <button id="nextTurnBtn" class="hidden">次のターンへ</button>
 
       <button id="backToSetupBtn" class="hidden">最初の画面に戻る</button>
 
     </section>
+
+  <div id="yakuHelp" class="yaku-help hidden">
+    <div class="yaku-help-inner">
+      <div class="yaku-help-header">
+        <span>役一覧</span>
+        <button id="closeYakuHelp">×</button>
+      </div>
+      <div id="yakuHelpContent"></div>
+    </div>
+  </div>
 
   </div>
 
