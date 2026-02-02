@@ -57,21 +57,22 @@ function showResult(text) {
 
 function addLog(text, playerName, options = {}) {
   const log = document.getElementById("log");
+  let div = null;
 
+  // ★ 既存ログを探す（replace用）
   if (options.replace && playerName) {
-    const old = log.querySelector(
+    div = log.querySelector(
       `div[data-player="${playerName}"]`
     );
-    if (old) {
-      old.replaceWith(div);
-      return;
-    }
   }
 
-  const div = document.createElement("div");
-
-  if (playerName) {
-    div.dataset.player = playerName;
+  // ★ 無ければ新規作成
+  if (!div) {
+    div = document.createElement("div");
+    if (playerName) {
+      div.dataset.player = playerName;
+    }
+    log.appendChild(div);
   }
 
   const match = text.match(/（×(\d+)）/);
@@ -80,15 +81,11 @@ function addLog(text, playerName, options = {}) {
     const mul = Number(match[1]);
     let className = "";
 
-    // ① 明示指定（最優先）
     if (options.weakMultiplier) {
       className = "weak";
     } else if (options.strongMultiplier) {
       className = "strong";
-    }
-
-    // ② 自動判定
-    else if (
+    } else if (
       options.autoColor &&
       playerName &&
       Array.isArray(players)
@@ -113,11 +110,10 @@ function addLog(text, playerName, options = {}) {
     div.textContent = text;
   }
 
-  log.appendChild(div);
-
-  // ★ ログ追加後、常に一番下へスクロール
+  // ★ 常に一番下へスクロール
   log.scrollTop = log.scrollHeight;
 }
+
 
 function highlightWeakestInLog() {
   const log = document.getElementById("log");
@@ -145,19 +141,19 @@ function highlightWeakestInLog() {
 }
 
 function refreshStrongWeakLog() {
-
   const log = document.getElementById("log");
 
-  // まず全員の倍率表示を消す
-  log.querySelectorAll("div[data-player]").forEach(row => {
-    row.innerHTML = row.innerHTML.replace(/（<span class="mul.*?<\/span>）/, "");
-  });
-
-
-  // strongWeak モードじゃなければ終わり
+  // ★ strongWeak 以外では何もしない
   if (GameState.calcMode !== "strongWeak") return;
 
-  // 確定者のみ
+  // ★ ここから先は strongWeak 専用処理
+  log.querySelectorAll("div[data-player]").forEach(row => {
+    row.innerHTML = row.innerHTML.replace(
+      /（<span class="mul.*?<\/span>）/,
+      ""
+    );
+  });
+
   const confirmed = players.filter(p => p.yakuRank !== null);
   if (confirmed.length === 0) return;
 
@@ -169,7 +165,7 @@ function refreshStrongWeakLog() {
     strong = confirmed
       .filter(p => p.yakuRank >= weakMin)
       .sort((a, b) => b.yakuRank - a.yakuRank)[0];
-  
+
     weak = confirmed
       .filter(p => p.yakuRank <= strongMax)
       .sort((a, b) => a.yakuRank - b.yakuRank)[0];
@@ -177,7 +173,7 @@ function refreshStrongWeakLog() {
     strong = confirmed
       .filter(p => p.yakuRank <= strongMax)
       .sort((a, b) => a.yakuRank - b.yakuRank)[0];
-  
+
     weak = confirmed
       .filter(p => p.yakuRank >= weakMin)
       .sort((a, b) => b.yakuRank - a.yakuRank)[0];
@@ -185,13 +181,12 @@ function refreshStrongWeakLog() {
 
   [strong, weak].forEach(p => {
     if (!p) return;
-    const row = log.querySelector(
-      `div[data-player="${p.name}"]`
-    );
+    const row = log.querySelector(`div[data-player="${p.name}"]`);
     if (!row) return;
 
     const mul = getPlayerMultiplier(p);
     if (mul === 1) return;
+
     const className = p === strong ? "strong" : "weak";
     row.innerHTML += `（<span class="mul ${className}">×${mul}</span>）`;
   });
@@ -343,6 +338,93 @@ soundBtn.onclick = () => {
 
   updateSoundIcon();
 };
+
+document.getElementById("yakuHelpBtn").onclick = () => {
+  openYakuHelp();
+};
+
+document.getElementById("closeYakuHelp").onclick = () => {
+  closeYakuHelp();
+};
+
+function openYakuHelp() {
+  renderYakuHelp();
+  document.getElementById("yakuHelp").classList.remove("hidden");
+}
+
+function closeYakuHelp() {
+  document.getElementById("yakuHelp").classList.add("hidden");
+}
+
+function renderYakuHelp() {
+  const area = document.getElementById("yakuHelpContent");
+  area.innerHTML = "";
+
+  if (GameState.version === 1) {
+    area.innerHTML = `
+      <div>ピンゾロ   ：５倍付け</div>
+      <div>奇数ゾロ   ：３倍付け</div>
+      <div>暴走(135)  ：３倍付け</div>
+      <div>シゴロ     ：２倍付け</div>
+      <div>目あり</div>
+      <div>目なし</div>
+      <div>ヒフミ     ：２倍払い</div>
+      <div>逆暴走(246)：３倍払い</div>
+      <div>偶数ゾロ   ：３倍払い</div>
+      <div>ローゾロ   ：５倍払い</div>
+    `;
+  } else {
+    area.innerHTML = `
+      <div>ピンゾロ：みんなで乾杯(1倍付け)</div>
+      <div>ツーゾロ：左右と乾杯(２倍払い)</div>
+      <div>サンゾロ：現状最弱振り直し(２倍付け)</div>
+      <div>ヨンゾロ：好きな人と乾杯(２倍払い)</div>
+      <div>ゴゾロ  ：特殊効果無効(２倍付け)</div>
+      <div>ローゾロ：革命(２倍払い)</div>
+      <div>シゴロ     ：２倍付け</div>
+      <div>目あり</div>
+      <div>目なし</div>
+      <div>ヒフミ     ：２倍払い</div>
+      <div>？？？  ：３連目なしかつ合計が同じ(７倍付け)</div>
+    `;
+  }
+}
+
+function renderYakuHelpInline() {
+  const area = document.getElementById("yakuHelpInline");
+  if (!area) return;
+
+  if (GameState.version === 1) {
+    area.innerHTML = `
+      <strong>役一覧（V1）</strong><br>
+      <div>ピンゾロ   ：５倍付け</div>
+      <div>奇数ゾロ   ：３倍付け</div>
+      <div>暴走(135)  ：３倍付け</div>
+      <div>シゴロ     ：２倍付け</div>
+      <div>目あり</div>
+      <div>目なし</div>
+      <div>ヒフミ     ：２倍払い</div>
+      <div>逆暴走(246)：３倍払い</div>
+      <div>偶数ゾロ   ：３倍払い</div>
+      <div>ローゾロ   ：５倍払い</div>
+    `;
+  } else {
+    area.innerHTML = `
+      <strong>役一覧（V2）</strong><br>
+      <div>ピンゾロ：みんなで乾杯(1倍付け)</div>
+      <div>ツーゾロ：左右と乾杯(２倍払い)</div>
+      <div>サンゾロ：現状最弱振り直し(２倍付け)</div>
+      <div>ヨンゾロ：好きな人と乾杯(２倍払い)</div>
+      <div>ゴゾロ  ：特殊効果無効(２倍付け)</div>
+      <div>ローゾロ：革命(２倍払い)</div>
+      <div>シゴロ     ：２倍付け</div>
+      <div>目あり</div>
+      <div>目なし</div>
+      <div>ヒフミ     ：２倍払い</div>
+      <div>？？？  ：３連目なしかつ合計が同じ(７倍付け)</div>
+    `;
+  }
+}
 
 initToggles();
 initSegments();
