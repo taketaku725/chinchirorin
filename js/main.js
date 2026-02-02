@@ -22,8 +22,16 @@ function getNameWidth(str) {
 
 function addPlayer() {
   const input = document.getElementById("newPlayerName");
-  const name = input.value.trim();
-  if (!name) return;
+  let name = input.value.trim();
+  if (!name) {
+    let index = 1;
+    while (
+      playerConfig.some(p => p.name === `プレイヤー${index}`)
+    ) {
+      index++;
+    }
+    name = `プレイヤー${index}`;
+  }
 
   if (getNameWidth(name) > 12) {
     alert("プレイヤー名は全角6文字 / 半角12文字までです");
@@ -101,6 +109,8 @@ document.getElementById("startBtn").onclick = () => {
     GameState.version === 2
       ? "バージョン2（特殊効果あり）"
       : "バージョン1（通常ルール）";
+
+  renderYakuHelpInline();
 
   // ★ ⑤ 最初のプレイヤー表示
   updateTurn();
@@ -234,9 +244,7 @@ function handleRollResult(dice, y, displayYakuName) {
 
     GameState.pinzoroLock = true;
     
-    if (!GameState.pinzoroLock) {
-      btn.disabled = false;
-    }
+    btn.disabled = false;
     btn.classList.add("pinzoro-flash");
 
     setTimeout(() => {
@@ -253,22 +261,27 @@ function handleRollResult(dice, y, displayYakuName) {
 
   if (GameState.version === 2 && y.name === "サンゾロ") {
 
-    const confirmed = players.filter(p => p.yakuRank !== null);
-    const weakestNow = weakestPlayers(confirmed);
-
-    weakestNow.forEach(pw => {
-      showInstantMessage(`${pw.name} 振り直し！`);
-    });
+    // ★ 対象は「その時点で確定している人＋自分」
+    const candidates = players.filter(p =>
+      p.yakuRank !== null || p === currentPlayer()
+    );
+  
+    const weakestNow = weakestPlayers(candidates);
     
-    GameState.redoQueue = weakestNow.map(pw =>
-      players.indexOf(pw)
+    GameState.redoQueue = weakestNow.map(p =>
+      players.indexOf(p)
     );
 
-    GameState.redoOriginTurn = GameState.turn + 1;
-    
-    // ★ サンゾロ待機中
+    // ★ 元の続き位置を保存（必ず +1）
+    GameState.redoOriginTurn = (GameState.turn + 1) % players.length;
+  
     GameState.sanzoPending = true;
+  
+    weakestNow.forEach(p =>
+      showInstantMessage(`${p.name} 振り直し！`)
+    );
   }
+
         
   if (GameState.version === 2 && y.name === "ヨンゾロ") {
     GameState.turnEffects.push(
@@ -312,9 +325,17 @@ function handleRollResult(dice, y, displayYakuName) {
       : YAKU_MULTIPLIER[yakuKey]) ??
     1;
 
-  if (mul !== 1 && !GameState.loggedYaku.has(yakuKey)) {
+  if (
+    mul !== 1 &&
+    (
+      GameState.calcMode === "all" ||
+      !GameState.loggedYaku.has(yakuKey)
+    )
+  ) {
     logText += `（×${mul}）`;
-    GameState.loggedYaku.add(yakuKey);
+    if (GameState.calcMode !== "all") {
+      GameState.loggedYaku.add(yakuKey);
+    }
   }
 
   const confirmed = players.filter(pl => pl.yakuRank !== null);
@@ -332,19 +353,20 @@ function handleRollResult(dice, y, displayYakuName) {
 
   // redo が終わり、再開位置がある場合
   if (
+    GameState.sanzoPending &&
     GameState.redoQueue.length === 0 &&
     GameState.redoOriginTurn !== null
   ) {
     GameState.turn = GameState.redoOriginTurn;
     GameState.redoOriginTurn = null;
-    
-    rollBtn.disable = false;
+    GameState.sanzoPending = false; 
+   
+    rollBtn.disabled = false;
+    updateTurn();
+    scheduleAutoRoll();
+    return;
 
-    // ★ サンゾロ振り直し終了後は必ず復帰
-    if (!GameState.pinzoroLock) {
-      document.getElementById("rollBtn").disabled = false;
     }
-  }
 
   /// ★ 振り直しキューがある場合はそちらを優先
   if (GameState.redoQueue.length > 0) {
@@ -353,11 +375,13 @@ function handleRollResult(dice, y, displayYakuName) {
 
     // ★【ここ】redo でも必ず 0 に戻す
     GameState.rollCount = 0;
+    players[GameState.turn].sums = [];
     
     if (!GameState.pinzoroLock) {
       document.getElementById("rollBtn").disabled = false;
     }
     updateTurn();
+    scheduleAutoRoll();
     return;
   }
     
@@ -384,10 +408,9 @@ function handleRollResult(dice, y, displayYakuName) {
     if (!GameState.pinzoroLock) {
       document.getElementById("rollBtn").disabled = false;
     }
+  }
 }
 
-
-}
 
 function scheduleAutoRoll() {
   if (!GameState.autoRoll) return;
@@ -417,6 +440,8 @@ document.getElementById("nextTurnBtn").onclick = () => {
   GameState.revolution = false;
   GameState.redoQueue = [];
   GameState.redoOriginTurn = null;
+
+  document.getElementById("backToSetupBtn").classList.add("hidden");
 
   // ★ 追加：特殊効果表示を消す
   document.getElementById("effectResult").innerHTML = "";
