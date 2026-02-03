@@ -520,6 +520,24 @@ button:disabled {
   text-shadow: 0 0 4px rgba(255, 215, 0, 0.5);
 }
 
+.history-log {
+  margin-top: 8px;
+  padding: 6px 8px;
+  font-size: 12px;
+  background: rgba(0,0,0,0.15);
+  border-radius: 8px;
+
+  max-height: 4.8em;      /* 約4行 */
+  overflow-y: auto;
+
+  color: #ddd;
+}
+
+.history-log div {
+  line-height: 1.2em;
+  white-space: nowrap;
+}
+
 #app {
   max-width: 420px;
   margin: 0 auto;
