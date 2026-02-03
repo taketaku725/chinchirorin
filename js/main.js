@@ -143,6 +143,11 @@ document.getElementById("rollBtn").onclick = () => {
   if (y.name === "目あり" && y.sub != null) {
     displayYakuName = `${y.sub}`;
   }
+  
+  addHistoryLog(
+    `${p.name} ${GameState.rollCount}投目：` +
+    `${dice.join(",")}（${displayYakuName}）`
+  );
 
   // ② 演出スキップ分岐
   if (GameState.skipAnimation) {
@@ -475,5 +480,6 @@ document.getElementById("backToSetupBtn").onclick = () => {
   resetGameUI();
   document.getElementById("backToSetupBtn").classList.add("hidden");
 };
+
 
 
