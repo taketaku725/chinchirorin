@@ -305,13 +305,6 @@ function handleRollResult(dice, y, displayYakuName) {
   p.mul = y.mul ?? 1;
   p.yakuRank = getYakuRank(p.yaku, p.sub, p);
 
-  if (GameState.sanzoPending && GameState.redoQueue.length === 0) {
-    // この確定が「振り直しプレイヤーの確定」なら消す
-    clearInstantMessage();
-    GameState.sanzoPending = false;
-  }
-
-
   // ★ 内部判定用キー（倍率・loggedYaku 用）
   const yakuKey = p.yaku ?? y.name;
 
@@ -351,22 +344,25 @@ function handleRollResult(dice, y, displayYakuName) {
   highlightWeakestInLog();
   refreshStrongWeakLog();
 
-  // redo が終わり、再開位置がある場合
+  // ★ サンゾロ振り直しが「全員終わった瞬間」
   if (
     GameState.sanzoPending &&
     GameState.redoQueue.length === 0 &&
     GameState.redoOriginTurn !== null
   ) {
     GameState.turn = GameState.redoOriginTurn;
+
+    GameState.sanzoPending = false;
     GameState.redoOriginTurn = null;
-    GameState.sanzoPending = false; 
-   
+
+    GameState.rollCount = 0;
+
     rollBtn.disabled = false;
     updateTurn();
     scheduleAutoRoll();
-    return;
 
-    }
+    return; // ★絶対に必要
+  }
 
   /// ★ 振り直しキューがある場合はそちらを優先
   if (GameState.redoQueue.length > 0) {
@@ -477,3 +473,4 @@ document.getElementById("backToSetupBtn").onclick = () => {
   resetGameUI();
   document.getElementById("backToSetupBtn").classList.add("hidden");
 };
+
