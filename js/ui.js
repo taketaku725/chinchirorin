@@ -192,6 +192,20 @@ function refreshStrongWeakLog() {
   });
 }
 
+function addHistoryLog(text) {
+  const area = document.getElementById("historyLog");
+  const div = document.createElement("div");
+  div.textContent = text;
+  area.appendChild(div);
+
+  // 常に一番下へスクロール
+  area.scrollTop = area.scrollHeight;
+}
+
+function resetHistoryLog() {
+  document.getElementById("historyLog").innerHTML = "";
+}
+
 function showFinalResult(weakest, cups) {
   const names = weakest.map(p => p.name).join("、");
   document.getElementById("result").textContent =
@@ -429,4 +443,5 @@ function renderYakuHelpInline() {
 initToggles();
 initSegments();
 updateSoundIcon();
+
 
