@@ -16,4 +16,6 @@ const GameState = {
   redoOriginTurn: null,
   loggedYaku: new Set(),
   sanzoPending: false,
+  blockAutoRollOnce: false,
 };
+
