@@ -273,7 +273,7 @@ function handleRollResult(dice, y, displayYakuName) {
     );
 
     // ★ 元の続き位置を保存（必ず +1）
-    GameState.redoOriginTurn = (GameState.turn + 1) % players.length;
+    GameState.redoOriginTurn = GameState.turn;
   
     GameState.sanzoPending = true;
   
@@ -350,7 +350,9 @@ function handleRollResult(dice, y, displayYakuName) {
     GameState.redoQueue.length === 0 &&
     GameState.redoOriginTurn !== null
   ) {
-    GameState.turn = GameState.redoOriginTurn;
+    clearInstantMessage();
+    
+    GameState.turn = (GameState.redoOriginTurn + 1) % players.length;
 
     GameState.sanzoPending = false;
     GameState.redoOriginTurn = null;
@@ -473,4 +475,5 @@ document.getElementById("backToSetupBtn").onclick = () => {
   resetGameUI();
   document.getElementById("backToSetupBtn").classList.add("hidden");
 };
+
 
