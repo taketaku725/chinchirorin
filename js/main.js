@@ -78,6 +78,7 @@ document.getElementById("startBtn").onclick = () => {
   GameState.redoQueue = [];
   GameState.redoOriginTurn = null;
   GameState.revolution = false;
+  resetHistoryLog();
 
   // ★ ① setup画面の設定を読む
   const activeNames = playerConfig
@@ -443,6 +444,7 @@ document.getElementById("nextTurnBtn").onclick = () => {
   GameState.revolution = false;
   GameState.redoQueue = [];
   GameState.redoOriginTurn = null;
+  resetHistoryLog();
 
   document.getElementById("backToSetupBtn").classList.add("hidden");
 
@@ -480,6 +482,7 @@ document.getElementById("backToSetupBtn").onclick = () => {
   resetGameUI();
   document.getElementById("backToSetupBtn").classList.add("hidden");
 };
+
 
 
 
