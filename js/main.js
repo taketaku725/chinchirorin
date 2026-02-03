@@ -365,9 +365,10 @@ function handleRollResult(dice, y, displayYakuName) {
 
     GameState.rollCount = 0;
 
+    GameState.blockAutoRollOnce = true;
+
     rollBtn.disabled = false;
     updateTurn();
-    scheduleAutoRoll();
 
     return; // ★絶対に必要
   }
@@ -418,6 +419,11 @@ function handleRollResult(dice, y, displayYakuName) {
 
 function scheduleAutoRoll() {
   if (!GameState.autoRoll) return;
+
+  if (GameState.blockAutoRollOnce) {
+    GameState.blockAutoRollOnce = false;
+    return;
+  }
 
   const p = currentPlayer();
 
@@ -482,6 +488,7 @@ document.getElementById("backToSetupBtn").onclick = () => {
   resetGameUI();
   document.getElementById("backToSetupBtn").classList.add("hidden");
 };
+
 
 
 
