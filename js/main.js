@@ -267,26 +267,35 @@ function handleRollResult(dice, y, displayYakuName) {
 
   if (GameState.version === 2 && y.name === "サンゾロ") {
 
-    // ★ 対象は「その時点で確定している人＋自分」
+    const current = currentPlayer();
+
     const candidates = players.filter(p =>
-      p.yakuRank !== null || p === currentPlayer()
-    );
-  
-    const weakestNow = weakestPlayers(candidates);
-    
-    GameState.redoQueue = weakestNow.map(p =>
-      players.indexOf(p)
+      p.yakuRank !== null || p === current
     );
 
-    // ★ 元の続き位置を保存（必ず +1）
-    GameState.redoOriginTurn = GameState.turn;
-  
-    GameState.sanzoPending = true;
-  
-    weakestNow.forEach(p =>
-      showInstantMessage(`${p.name} 振り直し！`)
-    );
-  }
+    const weakestNow = weakestPlayers(candidates);
+
+    // ★ 自分が最弱に含まれているか？
+    const isSelfWeakest = weakestNow.includes(current);
+
+    if (isSelfWeakest) {
+      GameState.redoQueue = [players.indexOf(current)];
+    } else {
+      GameState.redoQueue = weakestNow.map(p =>
+        players.indexOf(p)
+      );
+    }
+
+  GameState.redoOriginTurn =
+    (GameState.turn + 1) % players.length;
+
+  GameState.sanzoPending = true;
+
+  GameState.redoQueue.forEach(i =>
+    showInstantMessage(`${players[i].name} 振り直し！`)
+  );
+}
+
 
         
   if (GameState.version === 2 && y.name === "ヨンゾロ") {
@@ -488,6 +497,7 @@ document.getElementById("backToSetupBtn").onclick = () => {
   resetGameUI();
   document.getElementById("backToSetupBtn").classList.add("hidden");
 };
+
 
 
 
