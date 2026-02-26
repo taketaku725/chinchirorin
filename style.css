@@ -477,6 +477,12 @@ button:disabled {
   margin-top: 12px;
 }
 
+#effectResult div {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffcc66;
+}
+
 #log {
   background: #0b261d;
   border-radius: 8px;
