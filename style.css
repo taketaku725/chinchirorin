@@ -469,6 +469,8 @@ button:disabled {
 }
 
 #result {
+  font-size: 24px;
+  font-weight: bold;
   background: #0f3327;
   border-radius: 8px;
   padding: 10px;
