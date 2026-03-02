@@ -9,6 +9,7 @@ const YAKU_MULTIPLIER = {
   "逆暴走": 3,
   "偶数ゾロ": 3,
   "ローゾロ": 5,
+  "アラシ": 3,
 };
 
 const YAKU_V2 = {
@@ -30,7 +31,6 @@ const V1_WEAK_MIN_RANK   = 11;  // ここからが「弱い層」
 const V2_STRONG_MAX_RANK = 9;   // ゴゾロ〜目あり
 const V2_WEAK_MIN_RANK   = 12;  // ヒフミ〜？？？
 
-
 function judgeYaku(dice) {
   const [a, b, c] = dice;
   const key = `${a}${b}${c}`;
@@ -51,37 +51,39 @@ function judgeYaku(dice) {
     return { name: "ピンゾロ", sub: null };
   }
 
-  // 奇数ゾロ
-  if (a === b && b === c && (a === 3 || a === 5)) {
-    return { name: "奇数ゾロ", sub: null };
-  }
-
-  // 偶数ゾロ
-  if (a === b && b === c && (a === 2 || a === 4)) {
+  //アラシ
+  if (a === b && b === c && (a === 2 || a === 3 || a === 4 || a === 5)) {
+    if (GameState.version === 0) {
+      return { name: "アラシ", sub: null };
+    }
+    if (a === 3 || a === 5) {
+      return { name: "奇数ゾロ", sub: null };
+    }
     return { name: "偶数ゾロ", sub: null };
   }
 
-  // ローゾロ
+  //ローゾロ
   if (a === 6 && b === 6 && c === 6) {
+    if (GameState.version === 0) {
+      return { name: "アラシ", sub: null };
+    }
     return { name: "ローゾロ", sub: null };
   }
 
   // 暴走（135）
   if (a === 1 && b === 3 && c === 5) {
-    // ★ バージョン2では目なし扱い
-    if (GameState.version === 2) {
-      return { name: "目なし", sub: null };
+    if (GameState.version === 1) {
+      return { name: "暴走", sub: null };
     }
-    return { name: "暴走", sub: null };
+    return { name: "目なし", sub: null };
   }
 
   // 逆暴走（246）
   if (a === 2 && b === 4 && c === 6) {
-    // ★ バージョン2では目なし扱い
-    if (GameState.version === 2) {
-      return { name: "目なし", sub: null };
+    if (GameState.version === 1) {
+      return { name: "逆暴走", sub: null };
     }
-    return { name: "逆暴走", sub: null };
+    return { name: "目なし", sub: null };
   }
 
   // シゴロ
@@ -116,10 +118,30 @@ function judgeYaku(dice) {
   return { name: "目なし", sub: null };
 }
 
-function getYakuRank(name, sub, player) {
+function getYakuRank(name, sub) {
+  if (GameState.version === 0) {
+    return getRankV0(name, sub);
+  }
+
   return GameState.version === 1
     ? getRankV1(name, sub)
     : getRankV2(name, sub);
+}
+
+function getRankV0(name, sub) {
+  switch (name) {
+    case "ピンゾロ": return 1;
+    case "アラシ":   return 2;
+    case "シゴロ":   return 3;
+    case "目なし":   return 10;
+    case "ヒフミ":   return 11;
+  }
+
+  if (name === "目あり") {
+    return 10 - sub; // 6→4, 1→9
+  }
+
+  return 999;
 }
 
 function getRankV1(name, sub) {
@@ -267,12 +289,20 @@ function calculateCups(players) {
 }
 
 function getStrongWeakBoundary() {
+  if (GameState.version === 0) {
+    return {
+      strongMax: 3,
+      weakMin: 10,
+    };
+  }
+
   if (GameState.version === 1) {
     return {
       strongMax: V1_STRONG_MAX_RANK,
       weakMin: V1_WEAK_MIN_RANK,
     };
   }
+
   return {
     strongMax: V2_STRONG_MAX_RANK,
     weakMin: V2_WEAK_MIN_RANK,
@@ -282,4 +312,3 @@ function getStrongWeakBoundary() {
 window.getStrongWeakBoundary = getStrongWeakBoundary;
 window.weakestPlayers = weakestPlayers;
 window.getYakuRank = getYakuRank;
-
