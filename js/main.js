@@ -106,10 +106,13 @@ document.getElementById("startBtn").onclick = () => {
 
   const label = document.getElementById("versionLabel");
 
-  label.textContent =
-    GameState.version === 2
-      ? "バージョン2（特殊効果あり）"
-      : "バージョン1（通常ルール）";
+  if (GameState.version === 0) {
+    label.textContent = "バージョン0（基本ルール）";
+  } else if (GameState.version === 1) {
+    label.textContent = "バージョン1（役増加）";
+  } else {
+    label.textContent = "バージョン2（特殊効果）";
+  }
 
   renderYakuHelpInline();
 
@@ -497,6 +500,7 @@ document.getElementById("backToSetupBtn").onclick = () => {
   resetGameUI();
   document.getElementById("backToSetupBtn").classList.add("hidden");
 };
+
 
 
 
