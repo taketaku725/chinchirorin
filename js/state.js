@@ -1,5 +1,5 @@
 const GameState = {
-  version: 1,
+  version: 0,
   calcMode: "all",
   skipAnimation: false,
   autoRoll: false,
@@ -18,4 +18,5 @@ const GameState = {
   sanzoPending: false,
   blockAutoRollOnce: false,
 };
+
 
