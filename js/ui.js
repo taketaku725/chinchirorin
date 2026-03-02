@@ -374,7 +374,16 @@ function renderYakuHelp() {
   const area = document.getElementById("yakuHelpContent");
   area.innerHTML = "";
 
-  if (GameState.version === 1) {
+  if (GameState.version === 0) {
+    area.innerHTML = `
+      <div>ピンゾロ：５倍付け</div>
+      <div>アラシ  ：３倍付け</div>
+      <div>シゴロ  ：２倍付け</div>
+      <div>目あり</div>
+      <div>目なし</div>
+      <div>ヒフミ  ：２倍払い</div>
+    `;
+  } else if (GameState.version === 1) {
     area.innerHTML = `
       <div>ピンゾロ   ：５倍付け</div>
       <div>奇数ゾロ   ：３倍付け</div>
@@ -408,7 +417,17 @@ function renderYakuHelpInline() {
   const area = document.getElementById("yakuHelpInline");
   if (!area) return;
 
-  if (GameState.version === 1) {
+  if (GameState.version === 0) {
+    area.innerHTML = `
+      <strong>役一覧（V0）</strong><br>
+      <div>ピンゾロ：５倍付け</div>
+      <div>アラシ  ：３倍付け</div>
+      <div>シゴロ  ：２倍付け</div>
+      <div>目あり</div>
+      <div>目なし</div>
+      <div>ヒフミ  ：２倍払い</div>
+    `;
+  } else if (GameState.version === 1) {
     area.innerHTML = `
       <strong>役一覧（V1）</strong><br>
       <div>ピンゾロ   ：５倍付け</div>
@@ -443,5 +462,3 @@ function renderYakuHelpInline() {
 initToggles();
 initSegments();
 updateSoundIcon();
-
-
