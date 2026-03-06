@@ -11,7 +11,7 @@ const YAKU_MULTIPLIER = {
   "ローゾロ": 5,
   "アラシ": 3,
   "ションベン": 1,
-  "ラッキーセブン": 10,
+  "ラッキーセブン": 7,
 };
 
 const YAKU_V2 = {
@@ -318,5 +318,6 @@ function getStrongWeakBoundary() {
 window.getStrongWeakBoundary = getStrongWeakBoundary;
 window.weakestPlayers = weakestPlayers;
 window.getYakuRank = getYakuRank;
+
 
 
