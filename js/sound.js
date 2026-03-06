@@ -7,6 +7,7 @@ const VOLUME_MAP = {
 
 const sounds = {
   roll: new Audio("sounds/roll.mp3"),
+  lucky7: new Audio("sounds/seven.mp3")
 };
 
 function playSE(key) {
