@@ -139,6 +139,8 @@ document.getElementById("rollBtn").onclick = () => {
   // ★ ラッキーセブン（V1限定 0.1%）
   if (GameState.version === 1 && Math.random() < 0.001) {
 
+    playSE("lucky7");
+
     const dice = [7,7,7];
 
     stopDiceImmediately(dice);
@@ -569,6 +571,7 @@ document.getElementById("backToSetupBtn").onclick = () => {
   resetGameUI();
   document.getElementById("backToSetupBtn").classList.add("hidden");
 };
+
 
 
 
