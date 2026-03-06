@@ -148,7 +148,7 @@ document.getElementById("rollBtn").onclick = () => {
     handleRollResult(dice, {
       name: "ラッキーセブン",
       sub: null,
-      mul: 10
+      mul: 7
     }, "7,7,7");
 
     return;
@@ -571,6 +571,7 @@ document.getElementById("backToSetupBtn").onclick = () => {
   resetGameUI();
   document.getElementById("backToSetupBtn").classList.add("hidden");
 };
+
 
 
 
