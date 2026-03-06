@@ -463,6 +463,16 @@ button:disabled {
 .top    { transform: rotateX( 90deg) translateZ(36px); background-image: url(img/dice5.png); }
 .bottom { transform: rotateX(-90deg) translateZ(36px); background-image: url(img/dice2.png); }
 
+.dice7 .front,
+.dice7 .back,
+.dice7 .left,
+.dice7 .right,
+.dice7 .top,
+.dice7 .bottom {
+  background-image: url("img/dice7.png");
+  background-size: cover;
+}
+
 #turnInfo {
   font-size: 20px;
   text-align: center;
