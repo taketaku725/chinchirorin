@@ -10,6 +10,7 @@ const YAKU_MULTIPLIER = {
   "偶数ゾロ": 3,
   "ローゾロ": 5,
   "アラシ": 3,
+  "ションベン": 1,
 };
 
 const YAKU_V2 = {
@@ -135,6 +136,7 @@ function getRankV0(name, sub) {
     case "シゴロ":   return 3;
     case "目なし":   return 10;
     case "ヒフミ":   return 11;
+    case "ションベン": return 10.5;
   }
 
   if (name === "目あり") {
@@ -155,6 +157,7 @@ function getRankV1(name, sub) {
     case "逆暴走": 
     case "偶数ゾロ": return 12;
     case "ローゾロ": return 13;
+    case "ションベン": return 10.5;
   }
 
   if (name === "目あり") {
@@ -176,6 +179,7 @@ function getRankV2(name, sub) {
     case "ヨンゾロ": return 13;
     case "ローゾロ": return 14;
     case "？？？": return 0;
+    case "ションベン": return 11.5;
   }
 
   if (name === "目あり") {
@@ -312,3 +316,4 @@ function getStrongWeakBoundary() {
 window.getStrongWeakBoundary = getStrongWeakBoundary;
 window.weakestPlayers = weakestPlayers;
 window.getYakuRank = getYakuRank;
+
