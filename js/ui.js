@@ -381,16 +381,19 @@ function renderYakuHelp() {
       <div>シゴロ  ：２倍付け</div>
       <div>目あり</div>
       <div>目なし</div>
+      <div>ションベン</div>
       <div>ヒフミ  ：２倍払い</div>
     `;
   } else if (GameState.version === 1) {
     area.innerHTML = `
+      <div>ラッキーセブン：７倍付け<div>
       <div>ピンゾロ   ：５倍付け</div>
       <div>奇数ゾロ   ：３倍付け</div>
       <div>暴走(135)  ：３倍付け</div>
       <div>シゴロ     ：２倍付け</div>
       <div>目あり</div>
       <div>目なし</div>
+      <div>ションベン</div>
       <div>ヒフミ     ：２倍払い</div>
       <div>逆暴走(246)：３倍払い</div>
       <div>偶数ゾロ   ：３倍払い</div>
@@ -407,6 +410,7 @@ function renderYakuHelp() {
       <div>シゴロ     ：２倍付け</div>
       <div>目あり</div>
       <div>目なし</div>
+      <div>ションベン</div>
       <div>ヒフミ     ：２倍払い</div>
       <div>？？？  ：３連目なしかつ合計が同じ(７倍付け)</div>
     `;
@@ -462,3 +466,4 @@ function renderYakuHelpInline() {
 initToggles();
 initSegments();
 updateSoundIcon();
+
