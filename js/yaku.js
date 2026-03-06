@@ -11,6 +11,7 @@ const YAKU_MULTIPLIER = {
   "ローゾロ": 5,
   "アラシ": 3,
   "ションベン": 1,
+  "ラッキーセブン": 10,
 };
 
 const YAKU_V2 = {
@@ -148,6 +149,7 @@ function getRankV0(name, sub) {
 
 function getRankV1(name, sub) {
   switch (name) {
+    case "ラッキーセブン": return 0;
     case "ピンゾロ": return 1;
     case "奇数ゾロ":
     case "暴走": return 2;
@@ -316,4 +318,5 @@ function getStrongWeakBoundary() {
 window.getStrongWeakBoundary = getStrongWeakBoundary;
 window.weakestPlayers = weakestPlayers;
 window.getYakuRank = getYakuRank;
+
 
