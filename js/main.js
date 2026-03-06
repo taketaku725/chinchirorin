@@ -231,6 +231,11 @@ function handleRollResult(dice, y, displayYakuName) {
     GameState.rollCount = 0;
     p.sums = [];
 
+    // ★ここで復活
+    document.getElementById("dice1").style.visibility = "";
+    document.getElementById("dice2").style.visibility = "";
+    document.getElementById("dice3").style.visibility = "";
+
     if (GameState.turn >= players.length) {
       const weakest = weakestPlayers(players);
       const cups = calculateCups(players);
@@ -513,11 +518,6 @@ function handleShonben() {
     return;
   }
 
-  // ★サイコロ復活（忘れると永久に消える）
-  document.getElementById("dice1").style.visibility = "";
-  document.getElementById("dice2").style.visibility = "";
-  document.getElementById("dice3").style.visibility = "";
-
   updateTurn();
 
   if (!GameState.pinzoroLock) {
@@ -571,6 +571,7 @@ document.getElementById("backToSetupBtn").onclick = () => {
   resetGameUI();
   document.getElementById("backToSetupBtn").classList.add("hidden");
 };
+
 
 
 
