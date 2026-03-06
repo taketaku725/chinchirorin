@@ -135,11 +135,29 @@ document.getElementById("rollBtn").onclick = () => {
 
   // ① 出目は先に確定
   const dice = rollDice();
+
+  // ★ ラッキーセブン（V1限定 0.1%）
+  if (GameState.version === 1 && Math.random() < 0.001) {
+
+    const dice = [7,7,7];
+
+    stopDiceImmediately(dice);
+
+    handleRollResult(dice, {
+      name: "ラッキーセブン",
+      sub: null,
+      mul: 10
+    }, "7,7,7");
+
+    return;
+  }
+  
   // ★ションベン判定（1%）
-if (Math.random() < 0.01) {
-  handleShonben();
-  return;
-}
+  if (Math.random() < 0.01) {
+    handleShonben();
+    return;
+  }
+  
   const sum = dice.reduce((a, b) => a + b, 0);
   p.sums.push(sum);
   GameState.rollCount++;
@@ -551,6 +569,7 @@ document.getElementById("backToSetupBtn").onclick = () => {
   resetGameUI();
   document.getElementById("backToSetupBtn").classList.add("hidden");
 };
+
 
 
 
