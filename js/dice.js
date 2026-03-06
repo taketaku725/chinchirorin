@@ -6,6 +6,7 @@ const DICE_ROTATION = {
   4: "rotateX(0deg) rotateY(90deg)",
   5: "rotateX(-90deg) rotateY(0deg)",
   6: "rotateX(0deg) rotateY(180deg)",
+  7: "rotateX(0deg) rotateY(0deg)",
 };
 
 const cubeState = [
@@ -54,6 +55,12 @@ function stopDiceAnimation(result) {
   cubes.forEach((cube, i) => {
     cube.classList.remove("rolling");
 
+    if (result[i] === 7) {
+      cube.classList.add("dice7");
+    } else {
+      cube.classList.remove("dice7");
+    }
+
     // ★ 最初から正面角度に着地
     cube.style.transform = DICE_ROTATION[result[i]];
   });
@@ -71,6 +78,14 @@ function rand() {
 function stopDiceImmediately(result) {
   cubes.forEach((cube, i) => {
     cube.classList.remove("rolling");
+
+    if (result[i] === 7) {
+      cube.classList.add("dice7");
+    } else {
+      cube.classList.remove("dice7");
+    }
+    
     cube.style.transform = DICE_ROTATION[result[i]];
   });
 }
+
