@@ -135,6 +135,11 @@ document.getElementById("rollBtn").onclick = () => {
 
   // ① 出目は先に確定
   const dice = rollDice();
+  // ★ションベン判定（1%）
+if (Math.random() < 0.01) {
+  handleShonben();
+  return;
+}
   const sum = dice.reduce((a, b) => a + b, 0);
   p.sums.push(sum);
   GameState.rollCount++;
@@ -453,6 +458,52 @@ function scheduleAutoRoll() {
   }
 }
 
+function handleShonben() {
+  const p = currentPlayer();
+
+  // サイコロ消す
+  document.getElementById("dice1").style.visibility = "hidden";
+  document.getElementById("dice2").style.visibility = "hidden";
+  document.getElementById("dice3").style.visibility = "hidden";
+
+  showResult("ションベン");
+
+  p.yaku = "ションベン";
+  p.sub = null;
+  p.mul = 1;
+
+  p.yakuRank = getYakuRank("ションベン", null);
+
+  addLog(`${p.name}：ションベン`, p.name, {
+    autoColor: true,
+    replace: true
+  });
+
+  // 次の人
+  GameState.turn++;
+  GameState.rollCount = 0;
+  p.sums = [];
+
+  if (GameState.turn >= players.length) {
+    const weakest = weakestPlayers(players);
+    const cups = calculateCups(players);
+    showFinalResult(weakest, cups);
+    showNextTurnButton();
+    showBackToSetup();
+    return;
+  }
+
+  // ★サイコロ復活（忘れると永久に消える）
+  document.getElementById("dice1").style.visibility = "";
+  document.getElementById("dice2").style.visibility = "";
+  document.getElementById("dice3").style.visibility = "";
+
+  updateTurn();
+
+  if (!GameState.pinzoroLock) {
+    document.getElementById("rollBtn").disabled = false;
+  }
+}
 
 document.getElementById("nextTurnBtn").onclick = () => {
   GameState.turn = 0;
@@ -500,6 +551,7 @@ document.getElementById("backToSetupBtn").onclick = () => {
   resetGameUI();
   document.getElementById("backToSetupBtn").classList.add("hidden");
 };
+
 
 
 
