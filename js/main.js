@@ -123,6 +123,12 @@ document.getElementById("startBtn").onclick = () => {
 const rollBtn = document.getElementById("rollBtn");
 
 document.getElementById("rollBtn").onclick = () => {
+
+  // ★ ダイスを必ず表示
+  document.getElementById("dice1").style.visibility = "";
+  document.getElementById("dice2").style.visibility = "";
+  document.getElementById("dice3").style.visibility = "";
+  
   if (GameState.autoRoll && this.disabled) return;
 
   const btn = rollBtn;
@@ -571,6 +577,7 @@ document.getElementById("backToSetupBtn").onclick = () => {
   resetGameUI();
   document.getElementById("backToSetupBtn").classList.add("hidden");
 };
+
 
 
 
