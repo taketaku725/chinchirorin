@@ -435,7 +435,7 @@ function renderYakuHelpInline() {
   } else if (GameState.version === 1) {
     area.innerHTML = `
       <strong>役一覧（V1）</strong><br>
-      <div>ラッキーセブン：７倍付け<div>
+      <div>ラッキーセブン：７倍付け</div>
       <div>ピンゾロ   ：５倍付け</div>
       <div>奇数ゾロ   ：３倍付け</div>
       <div>暴走(135)  ：３倍付け</div>
@@ -470,5 +470,6 @@ function renderYakuHelpInline() {
 initToggles();
 initSegments();
 updateSoundIcon();
+
 
 
