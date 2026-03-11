@@ -145,6 +145,10 @@ document.getElementById("rollBtn").onclick = () => {
   // ★ ラッキーセブン（V1限定 0.1%）
   if (GameState.version === 1 && Math.random() < 0.001) {
 
+    addHistoryLog(
+      `${p.name} ${GameState.rollCount + 1}投目：7,7,7（ラッキーセブン）`
+    );
+
     playSE("lucky7");
 
     const dice = [7,7,7];
@@ -577,6 +581,7 @@ document.getElementById("backToSetupBtn").onclick = () => {
   resetGameUI();
   document.getElementById("backToSetupBtn").classList.add("hidden");
 };
+
 
 
 
